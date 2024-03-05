@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
+import 'package:flutter_admin/app/service/bustype_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+
+import '../../../model/bustype_model.dart';
 
 class BustypeView extends StatefulWidget {
   const BustypeView({Key? key}) : super(key: key);
@@ -11,6 +13,8 @@ class BustypeView extends StatefulWidget {
 }
 
 class _BustypeViewState extends State<BustypeView> {
+  final DatabaseService _databaseService = DatabaseService();
+  var _searchQuery = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,151 +30,187 @@ class _BustypeViewState extends State<BustypeView> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                width: double.infinity,
-                height: 50,
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'ຄົ້ນຫາ..',
-                    hintStyle: GoogleFonts.notoSansLao(),
-                    prefixIcon: IconButton(
-                      icon: Icon(Icons.search),
-                      onPressed: () {},
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
+          child: Column(children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5.0),
+              width: double.infinity,
+              height: 50,
+              child: TextField(
+                onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+                decoration: InputDecoration(
+                  hintText: 'ຄົ້ນຫາ..',
+                  hintStyle: GoogleFonts.notoSansLao(),
+                  prefixIcon: IconButton(
+                    icon: Icon(Icons.search),
+                    onPressed: () {},
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
                   ),
                 ),
               ),
-              const SizedBox(height: 5),
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        openDialog();
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'ເພີ່ມ',
-                            style: GoogleFonts.notoSansLao(),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          const Icon(
-                            Icons.add,
-                            size: 24.0,
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 6),
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'ລາຍງານ',
-                            style: GoogleFonts.notoSansLao(),
-                          ),
-                          const SizedBox(
-                            width:
-                                10, // Adjust the width according to your needs
-                          ),
-                          const Icon(
-                            Icons.read_more_sharp,
-                            size: 24.0,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                child: Expanded(
-                  child: ListView(
-                    // Using ListView instead of Column to allow scrolling if necessary
-                    children: [
-                      Card(
-                        child: ListTile(
-                          title: Text(
-                            'ຊື່ :ລົດເມ',
-                            style: GoogleFonts.notoSansLao(fontSize: 17),
-                          ),
-                          subtitle: Text(
-                            'ລະຫັດ : 123',
-                            style: GoogleFonts.notoSansLao(fontSize: 16),
-                          ),
-                          trailing: PopupMenuButton(
-                            icon: Icon(Icons.more_vert),
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                value: 1,
-                                child: ListTile(
-                                  onTap: () {
-                                    EditeDialog();
-                                  },
-                                  leading: Icon(
-                                    Icons.edit,
-                                    color: Colors.orangeAccent,
-                                  ),
-                                  title: Text(
-                                    'ແກ້ໄຂ',
-                                    style: GoogleFonts.notoSansLao(),
-                                  ),
-                                ),
-                              ),
-                              PopupMenuItem(
-                                value: 1,
-                                child: ListTile(
-                                  onTap: () {
-                                    AwesomeDialog(
-                                      context: context,
-                                      animType: AnimType.scale,
-                                      dialogType: DialogType.info,
-                                      body: Center(
-                                        child: Text(
-                                          'ທ່ານຕ້ອງການລົບຂໍ້ມູນບໍ່.',
-                                          style: GoogleFonts.notoSansLao(
-                                              fontSize: 15),
-                                        ),
-                                      ),
-                                      btnCancelOnPress: () {},
-                                      btnOkOnPress: () {},
-                                    )..show();
-                                  },
-                                  leading: const Icon(
-                                    Icons.delete,
-                                    color: Colors.redAccent,
-                                  ),
-                                  title: Text(
-                                    'ລົບ',
-                                    style: GoogleFonts.notoSansLao(),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+            ),
+            const SizedBox(height: 5),
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      openDialog();
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'ເພີ່ມ',
+                          style: GoogleFonts.notoSansLao(),
                         ),
-                      ),
-                      // Add more ListTiles if needed
-                    ],
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        const Icon(
+                          Icons.add,
+                          size: 24.0,
+                        ),
+                      ],
+                    ),
                   ),
+                  SizedBox(width: 6),
+                  ElevatedButton(
+                    onPressed: () {},
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'ລາຍງານ',
+                          style: GoogleFonts.notoSansLao(),
+                        ),
+                        const SizedBox(
+                          width: 10, // Adjust the width according to your needs
+                        ),
+                        const Icon(
+                          Icons.read_more_sharp,
+                          size: 24.0,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              child: Expanded(
+                child: StreamBuilder(
+                  stream: _databaseService.getBustype(nameQuery: _searchQuery),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Error: ${snapshot.error}'),
+                      );
+                    }
+                    List bustype = snapshot.data?.docs ?? [];
+                    if (bustype.isEmpty) {
+                      return Center(
+                        child: Text(
+                          'ບໍ່ມີຂໍ້ມູນ.',
+                          style: GoogleFonts.notoSansLao(fontSize: 15),
+                        ),
+                      );
+                    }
+                    return ListView.builder(
+                      itemCount: bustype.length,
+                      itemBuilder: (context, index) {
+                        Bustype bustypeData = bustype[index].data();
+                        String bustypeId = bustype[index].id;
+                        return Card(
+                          child: ListTile(
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'ລະຫັດ: $bustypeId',
+                                  style: GoogleFonts.notoSansLao(fontSize: 15),
+                                ),
+                                SizedBox(height: 9),
+                                Text(
+                                  'ຊື່: ${bustypeData.nume}',
+                                  style: GoogleFonts.notoSansLao(
+                                    fontSize: 17,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            trailing: PopupMenuButton(
+                              icon: Icon(Icons.more_vert),
+                              itemBuilder: (context) => [
+                                PopupMenuItem(
+                                  value: 1,
+                                  child: ListTile(
+                                    onTap: () {
+                                      EditeDialog();
+                                    },
+                                    leading: const Icon(
+                                      Icons.edit,
+                                      color: Colors.orangeAccent,
+                                    ),
+                                    title: Text(
+                                      'ແກ້ໄຂ',
+                                      style: GoogleFonts.notoSansLao(),
+                                    ),
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: 1,
+                                  child: ListTile(
+                                    onTap: () {
+                                      AwesomeDialog(
+                                        context: context,
+                                        animType: AnimType.scale,
+                                        dialogType: DialogType.info,
+                                        body: Center(
+                                          child: Text(
+                                            'Are you sure you want to delete?',
+                                            style: GoogleFonts.notoSansLao(
+                                                fontSize: 15),
+                                          ),
+                                        ),
+                                        btnCancelOnPress: () {},
+                                        btnOkOnPress: () {},
+                                      )..show();
+                                    },
+                                    leading: const Icon(
+                                      Icons.delete,
+                                      color: Colors.redAccent,
+                                    ),
+                                    title: Text(
+                                      'Delete',
+                                      style: GoogleFonts.notoSansLao(),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
-            ],
-          ),
+            )
+          ]),
         ));
   }
 

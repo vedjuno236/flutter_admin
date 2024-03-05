@@ -4,6 +4,8 @@ import 'package:flutter/physics.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 
+import '../../../service/departures_servide.dart';
+
 class DeparturesView extends StatefulWidget {
   const DeparturesView({Key? key}) : super(key: key);
 
@@ -12,6 +14,8 @@ class DeparturesView extends StatefulWidget {
 }
 
 class _DeparturesViewState extends State<DeparturesView> {
+  final DatabaseService _databaseService = DatabaseService();
+  var _searchQuery = "";
   @override
   final List<String> busItems = [
     'ລົດເມທໍາມະດາ',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_admin/app/modules/home/view/home_view.dart';
 import 'package:flutter_admin/app/modules/login/onboarding/onboarding_screen.dart';
 import 'package:flutter_admin/firebase_options.dart';
 import 'package:intl/intl.dart';
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
         Locale('lo', 'LA'),
         Locale('en'),
       ],
-      home: const OnboardingScreen(),
+      home: const HomeView(),
     );
   }
 }

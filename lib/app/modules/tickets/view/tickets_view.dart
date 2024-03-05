@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_admin/app/model/tickets_model.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter/physics.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+
+import '../../../service/tickets_service.dart';
 
 class TicketsView extends StatefulWidget {
   const TicketsView({Key? key}) : super(key: key);
@@ -12,6 +14,8 @@ class TicketsView extends StatefulWidget {
 }
 
 class _TicketsViewState extends State<TicketsView> {
+  final DatabaseService _databaseService = DatabaseService();
+  var _searchQuery = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,6 +38,11 @@ class _TicketsViewState extends State<TicketsView> {
                 width: double.infinity,
                 height: 50,
                 child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
                   decoration: InputDecoration(
                     hintText: 'ຄົ້ນຫາ..',
                     hintStyle: GoogleFonts.notoSansLao(),
@@ -100,88 +109,126 @@ class _TicketsViewState extends State<TicketsView> {
               SizedBox(height: 10),
               Container(
                 child: Expanded(
-                  child: ListView(
-                    // Using ListView instead of Column to allow scrolling if necessary
-                    children: [
-                      Card(
-                        child: ListTile(
-                          title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'ຊື່ :ລົດ vip',
-                                style: GoogleFonts.notoSansLao(fontSize: 17),
-                              ),
-                              Text(
-                                'ລະຫັດ : 123',
-                                style: GoogleFonts.notoSansLao(fontSize: 16),
-                              ),
-                              Text(
-                                'ລາຄາຈອງ : 10 000',
-                                style: GoogleFonts.notoSansLao(fontSize: 16),
-                              ),
-                              Text(
-                                'ລາຄາ : 350 000',
-                                style: GoogleFonts.notoSansLao(fontSize: 16),
-                              ),
-                            ],
+                  child: StreamBuilder(
+                    stream:
+                        _databaseService.getTickets(nameQuery: _searchQuery),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Error: ${snapshot.error}'),
+                        );
+                      }
+                      List tickets = snapshot.data?.docs ?? [];
+                      if (tickets.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'ບໍ່ມີຂໍ້ມູນ.',
+                            style: GoogleFonts.notoSansLao(fontSize: 15),
                           ),
-                          trailing: PopupMenuButton(
-                            icon: Icon(Icons.more_vert),
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                value: 1,
-                                child: ListTile(
-                                  onTap: () {
-                                    EditeDialog();
-                                  },
-                                  leading: Icon(
-                                    Icons.edit,
-                                    color: Colors.orangeAccent,
+                        );
+                      }
+                      return ListView.builder(
+                        itemCount: tickets.length,
+                        itemBuilder: (context, index) {
+                          Tickets ticketsData = tickets[index].data();
+                          String ticketsId = tickets[index].id;
+                          return Card(
+                            child: ListTile(
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'ລະຫັດ: $ticketsId',
+                                    style:
+                                        GoogleFonts.notoSansLao(fontSize: 15),
                                   ),
-                                  title: Text(
-                                    'ແກ້ໄຂ',
-                                    style: GoogleFonts.notoSansLao(),
+                                  SizedBox(height: 9),
+                                  Text(
+                                    'ຊື່: ${ticketsData.name}',
+                                    style: GoogleFonts.notoSansLao(
+                                      fontSize: 17,
+                                      color: Colors.blue,
+                                    ),
                                   ),
-                                ),
+                                  Text(
+                                    'ລາຄາຈອງ: ${ticketsData.booking_price}',
+                                    style: GoogleFonts.notoSansLao(
+                                      fontSize: 17,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                  Text(
+                                    'ລາຄາແພັກເກັດ: ${ticketsData.price}',
+                                    style: GoogleFonts.notoSansLao(
+                                      fontSize: 17,
+                                      color: Colors.orangeAccent,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              PopupMenuItem(
-                                value: 1,
-                                child: ListTile(
-                                  onTap: () {
-                                    AwesomeDialog(
-                                      context: context,
-                                      animType: AnimType.scale,
-                                      dialogType: DialogType.info,
-                                      body: Center(
-                                        child: Text(
-                                          'ທ່ານຕ້ອງການລົບຂໍ້ມູນບໍ່.',
-                                          style: GoogleFonts.notoSansLao(
-                                              fontSize: 15),
-                                        ),
+                              trailing: PopupMenuButton(
+                                icon: Icon(Icons.more_vert),
+                                itemBuilder: (context) => [
+                                  PopupMenuItem(
+                                    value: 1,
+                                    child: ListTile(
+                                      onTap: () {
+                                        EditeDialog();
+                                      },
+                                      leading: const Icon(
+                                        Icons.edit,
+                                        color: Colors.orangeAccent,
                                       ),
-                                      btnCancelOnPress: () {},
-                                      btnOkOnPress: () {},
-                                    )..show();
-                                  },
-                                  leading: const Icon(
-                                    Icons.delete,
-                                    color: Colors.redAccent,
+                                      title: Text(
+                                        'ແກ້ໄຂ',
+                                        style: GoogleFonts.notoSansLao(),
+                                      ),
+                                    ),
                                   ),
-                                  title: Text(
-                                    'ລົບ',
-                                    style: GoogleFonts.notoSansLao(),
+                                  PopupMenuItem(
+                                    value: 1,
+                                    child: ListTile(
+                                      onTap: () {
+                                        AwesomeDialog(
+                                          context: context,
+                                          animType: AnimType.scale,
+                                          dialogType: DialogType.info,
+                                          body: Center(
+                                            child: Text(
+                                              'Are you sure you want to delete?',
+                                              style: GoogleFonts.notoSansLao(
+                                                  fontSize: 15),
+                                            ),
+                                          ),
+                                          btnCancelOnPress: () {},
+                                          btnOkOnPress: () {},
+                                        )..show();
+                                      },
+                                      leading: const Icon(
+                                        Icons.delete,
+                                        color: Colors.redAccent,
+                                      ),
+                                      title: Text(
+                                        'Delete',
+                                        style: GoogleFonts.notoSansLao(),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
-              ),
+              )
             ],
           ),
         ));

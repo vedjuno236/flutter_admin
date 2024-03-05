@@ -1,4 +1,4 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_admin/app/modules/booking/view/booking_view.dart';
 import 'package:flutter_admin/app/modules/bus/view/bus_view.dart';
@@ -20,6 +20,116 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  int codeCount = 0;
+  int Countbus = 0;
+  int Countstations = 0;
+  int CountDepartures = 0;
+  int CountRoutes = 0;
+  int CountTickets = 0;
+  int CounBooking = 0;
+  int CountPayment = 0;
+
+  void countFirebaseCodes() {
+    FirebaseFirestore.instance
+        .collection('BusType')
+        .get()
+        .then((QuerySnapshot snapshot) {
+      setState(() {
+        codeCount = snapshot.size;
+      });
+    });
+  }
+
+  void countFirebasebus() {
+    FirebaseFirestore.instance
+        .collection('Buses')
+        .get()
+        .then((QuerySnapshot snapshot) {
+      setState(() {
+        Countbus = snapshot.size;
+      });
+    });
+  }
+
+  void countFirebasestations() {
+    FirebaseFirestore.instance
+        .collection('Stations')
+        .get()
+        .then((QuerySnapshot snapshot) {
+      setState(() {
+        Countstations = snapshot.size;
+      });
+    });
+  }
+
+  void countFirebaseDepartures() {
+    FirebaseFirestore.instance
+        .collection('Departures')
+        .get()
+        .then((QuerySnapshot snapshot) {
+      setState(() {
+        CountDepartures = snapshot.size;
+      });
+    });
+  }
+
+  void countFirebaseRoutes() {
+    FirebaseFirestore.instance
+        .collection('Routes')
+        .get()
+        .then((QuerySnapshot snapshot) {
+      setState(() {
+        CountRoutes = snapshot.size;
+      });
+    });
+  }
+
+  void countFirebaseTickets() {
+    FirebaseFirestore.instance
+        .collection('Tickets')
+        .get()
+        .then((QuerySnapshot snapshot) {
+      setState(() {
+        CountTickets = snapshot.size;
+      });
+    });
+  }
+
+  void countFirebaseBooking() {
+    FirebaseFirestore.instance
+        .collection('Booking')
+        .get()
+        .then((QuerySnapshot snapshot) {
+      setState(() {
+        CounBooking = snapshot.size;
+      });
+    });
+  }
+
+  void countFirebasePayment() {
+    FirebaseFirestore.instance
+        .collection('Payment')
+        .get()
+        .then((QuerySnapshot snapshot) {
+      setState(() {
+        CountPayment = snapshot.size;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    countFirebaseCodes();
+    countFirebasebus();
+    countFirebasestations();
+    countFirebaseDepartures();
+    countFirebaseRoutes();
+    countFirebaseTickets();
+    countFirebaseBooking();
+    countFirebasePayment();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +165,10 @@ class _HomeViewState extends State<HomeView> {
                 height: 180,
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: <Color>[Colors.blueAccent, Colors.white],
+                    colors: <Color>[
+                      Color.fromARGB(255, 166, 18, 235),
+                      Colors.blueAccent
+                    ],
                   ),
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(10),
@@ -74,10 +187,10 @@ class _HomeViewState extends State<HomeView> {
                           animation: true,
                           animationDuration: 1000,
                           radius: 60,
-                          lineWidth: 15.0,
+                          lineWidth: 18.0,
                           percent: 0.4,
                           backgroundColor: Colors.deepPurple,
-                          progressColor: Colors.redAccent.shade200,
+                          progressColor: Colors.blueAccent,
                           circularStrokeCap: CircularStrokeCap.round,
                           center: const Text("60%"),
                         ),
@@ -560,8 +673,9 @@ class _HomeViewState extends State<HomeView> {
                               ),
                               const SizedBox(height: 5),
                               Text(
-                                'ຈໍານວນ',
-                                style: GoogleFonts.notoSansLao(),
+                                'ຈໍານວນ: $codeCount /ຄັນ',
+                                style: GoogleFonts.notoSansLao(
+                                    color: Colors.greenAccent),
                               ),
                             ],
                           )
@@ -609,10 +723,9 @@ class _HomeViewState extends State<HomeView> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'ຈໍານວນ',
+                                'ຈໍານວນ: $Countbus /ຄັນ',
                                 style: GoogleFonts.notoSansLao(
-                                  fontSize: 17,
-                                ),
+                                    color: Colors.deepOrange),
                               ),
                             ],
                           )
@@ -660,8 +773,9 @@ class _HomeViewState extends State<HomeView> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'ຈໍານວນ',
-                                style: GoogleFonts.notoSansLao(fontSize: 17),
+                                'ຈໍານວນ: $Countstations /ສະຖານີ',
+                                style: GoogleFonts.notoSansLao(
+                                    color: Colors.redAccent),
                               ),
                             ],
                           )
@@ -708,10 +822,9 @@ class _HomeViewState extends State<HomeView> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'ຈໍານວນ',
+                                'ຈໍານວນ: $CountDepartures /ອອກເດີນທາງ',
                                 style: GoogleFonts.notoSansLao(
-                                  fontSize: 17,
-                                ),
+                                    color: Colors.blueAccent),
                               ),
                             ],
                           )
@@ -758,8 +871,9 @@ class _HomeViewState extends State<HomeView> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'ຈໍານວນ',
-                                style: GoogleFonts.notoSansLao(fontSize: 17),
+                                'ຈໍານວນ: $CountRoutes /ເສັ້ນທາງ',
+                                style: GoogleFonts.notoSansLao(
+                                    color: Colors.blueGrey),
                               ),
                             ],
                           )
@@ -807,10 +921,9 @@ class _HomeViewState extends State<HomeView> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'ຈໍານວນ',
+                                'ຈໍານວນ: $CountTickets /ແພັກເກັດ',
                                 style: GoogleFonts.notoSansLao(
-                                  fontSize: 17,
-                                ),
+                                    color: Colors.redAccent),
                               ),
                             ],
                           )
@@ -857,10 +970,9 @@ class _HomeViewState extends State<HomeView> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'ຈໍານວນ',
+                                'ຈໍານວນ: $CounBooking /ການຈອງ',
                                 style: GoogleFonts.notoSansLao(
-                                  fontSize: 17,
-                                ),
+                                    color: Colors.orangeAccent),
                               ),
                             ],
                           )
@@ -906,11 +1018,10 @@ class _HomeViewState extends State<HomeView> {
                                     fontSize: 17, color: Colors.black38),
                               ),
                               SizedBox(height: 5),
-                              Text(
-                                'ຈໍານວນ',
+                               Text(
+                                'ຈໍານວນ: $CountPayment /ການຊໍາລະ',
                                 style: GoogleFonts.notoSansLao(
-                                  fontSize: 17,
-                                ),
+                                    color: Colors.blueAccent),
                               ),
                             ],
                           )

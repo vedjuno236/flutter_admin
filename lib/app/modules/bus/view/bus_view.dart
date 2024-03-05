@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
+import 'package:flutter_admin/app/model/bus_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+
+import '../../../service/buses_service.dart';
 
 class BusView extends StatefulWidget {
   const BusView({Key? key}) : super(key: key);
@@ -18,6 +20,9 @@ class _BusViewState extends State<BusView> {
     'ລົດຕູ້ vip',
   ];
   String? selectedValue;
+
+  final DatabaseService _databaseService = DatabaseService();
+  var _searchQuery = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,49 +110,86 @@ class _BusViewState extends State<BusView> {
             SizedBox(height: 10),
             Container(
               child: Expanded(
-                child: ListView(
-                  // Using ListView instead of Column to allow scrolling if necessary
-                  children: [
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
+                child: StreamBuilder(
+                  stream: _databaseService.getBuses(nameQuery: _searchQuery),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Error: ${snapshot.error}'),
+                      );
+                    }
+                    List buses = snapshot.data?.docs ?? [];
+                    if (buses.isEmpty) {
+                      return Center(
+                        child: Text(
+                          'ບໍ່ມີຂໍ້ມູນ.',
+                          style: GoogleFonts.notoSansLao(fontSize: 15),
+                        ),
+                      );
+                    }
+                    return ListView.builder(
+                      itemCount: buses.length,
+                      itemBuilder: (context, index) {
+                        Buses busesData = buses[index].data();
+                        String busesId = buses[index].id;
+                        return Card(
+                          child: ListTile(
+                            title: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'ລະຫັດ : 123',
-                                  style: GoogleFonts.notoSansLao(fontSize: 16),
+                                  'ລະຫັດ: $busesId',
+                                  style: GoogleFonts.notoSansLao(fontSize: 15),
+                                ),
+                                SizedBox(height: 9),
+                                Text(
+                                  'ຊື່: ${busesData.nume}',
+                                  style: GoogleFonts.notoSansLao(
+                                    fontSize: 17,
+                                    color: Colors.blue,
+                                  ),
                                 ),
                                 Text(
-                                  'ຊື່ :ລົດເມ',
-                                  style: GoogleFonts.notoSansLao(fontSize: 17),
+                                  'ປະເພດລົດ: ${busesData.busTypeId}',
+                                  style: GoogleFonts.notoSansLao(
+                                    fontSize: 15,
+                                  ),
                                 ),
                                 Text(
-                                  'ປະເພດລົດ : ລົດເມທໍາມະດາ',
-                                  style: GoogleFonts.notoSansLao(fontSize: 16),
+                                  'ທະບຽນລົດ: ${busesData.carnamber}',
+                                  style: GoogleFonts.notoSansLao(
+                                    fontSize: 17,
+                                    color: Colors.orangeAccent,
+                                  ),
                                 ),
                                 Text(
-                                  'ທະບຽນລົດ : ຫທ 1234',
-                                  style: GoogleFonts.notoSansLao(fontSize: 16),
+                                  'ຈໍານວນບ່ອນນັ່ງ: ${busesData.capacity}',
+                                  style: GoogleFonts.notoSansLao(
+                                    fontSize: 17,
+                                    color: Colors.orangeAccent,
+                                  ),
                                 ),
                                 Text(
-                                  'ຈໍານວນບ່ອນນັ່ງທໍາມະດາ : 40',
-                                  style: GoogleFonts.notoSansLao(fontSize: 16),
+                                  'ຈໍານວນບ່ອນນັ່ງ vip: ${busesData.capacityVip}',
+                                  style: GoogleFonts.notoSansLao(
+                                    fontSize: 17,
+                                    color: Colors.orangeAccent,
+                                  ),
                                 ),
                                 Text(
-                                  'ຈໍານວນບ່ອນນັ່ງ vip : 20',
-                                  style: GoogleFonts.notoSansLao(fontSize: 16),
-                                ),
-                                Text(
-                                  'ປະເພດແພັກແກັດ : ທໍາມະດາ',
-                                  style: GoogleFonts.notoSansLao(fontSize: 16),
+                                  'ປະເພດແພັກເກັດ: ${busesData.ticketId}',
+                                  style: GoogleFonts.notoSansLao(
+                                    fontSize: 15,
+                                  ),
                                 ),
                               ],
                             ),
-                            PopupMenuButton(
+                            trailing: PopupMenuButton(
                               icon: Icon(Icons.more_vert),
                               itemBuilder: (context) => [
                                 PopupMenuItem(
@@ -156,7 +198,7 @@ class _BusViewState extends State<BusView> {
                                     onTap: () {
                                       EditeDialog();
                                     },
-                                    leading: Icon(
+                                    leading: const Icon(
                                       Icons.edit,
                                       color: Colors.orangeAccent,
                                     ),
@@ -176,7 +218,7 @@ class _BusViewState extends State<BusView> {
                                         dialogType: DialogType.info,
                                         body: Center(
                                           child: Text(
-                                            'ທ່ານຕ້ອງການລົບຂໍ້ມູນບໍ່.',
+                                            'ທ່ານຕ້ອງການລົບຂໍ້ມູນແມ່ນບໍ່?',
                                             style: GoogleFonts.notoSansLao(
                                                 fontSize: 15),
                                           ),
@@ -190,21 +232,21 @@ class _BusViewState extends State<BusView> {
                                       color: Colors.redAccent,
                                     ),
                                     title: Text(
-                                      'ລົບ',
+                                      'Delete',
                                       style: GoogleFonts.notoSansLao(),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
-            ), // Add more ListTiles if needed
+            )
           ],
         ),
       ),
