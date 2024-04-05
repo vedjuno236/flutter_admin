@@ -1,25 +1,30 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Stations {
-  String nume;
+  String id;
+  String name;
 
   Stations({
-   required this.nume,
+    required this.id,
+    required this.name,
   });
 
-  Stations.fromJson(Map<String, Object?> json)
-      : this(nume: json['name']! as String);
+ Stations.fromJson(Map<String, dynamic> json)
+    : id = json['id'] as String? ?? '', // Provide default value if 'id' is null
+      name = json['name'] as String? ?? ''; // Provide default value if 'name' is null
 
-  
-
-  Stations copyWith({
-    String? nume,
-  }) {
-    return Stations(nume: nume ?? this.nume);
-  }
-  Map<String, Object > toJson() {
+  Map<String, dynamic> toJson() {
     return {
-      'nume': nume,
+      'id': id,
+      'name': name,
     };
+  }
+  
+    Stations copyWith({
+    String? id,
+    String? name,
+  }) {
+    return Stations(
+      id: id ?? this.id,
+      name: name ?? this.name,
+    );
   }
 }

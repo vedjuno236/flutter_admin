@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_admin/app/model/stations_model.dart';
 import 'package:flutter_admin/app/model/tickets_model.dart';
 
 const String TODO_COLLECTION_REF = "Tickets";
@@ -20,13 +19,21 @@ class DatabaseService {
 
   Stream<QuerySnapshot> getTickets({String? nameQuery}) {
     if (nameQuery != null && nameQuery.isNotEmpty) {
-      return _ticketsRef.where('price', isEqualTo: nameQuery).snapshots();
+      return _ticketsRef.where('name', isEqualTo: nameQuery).snapshots();
     } else {
       return _ticketsRef.snapshots();
     }
   }
 
-  void addStation(Stations tickets) async {
+  void addTickets(Tickets tickets) async {
     _ticketsRef.add(tickets);
+  }
+
+  void updateTickets(String ticketsId, tickets) {
+    _ticketsRef.doc(ticketsId).update(tickets.toJson());
+  }
+
+  void deleteTickets(String ticketsId) {
+    _ticketsRef.doc(ticketsId).delete();
   }
 }

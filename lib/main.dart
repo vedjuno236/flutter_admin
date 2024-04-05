@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin/app/modules/home/view/home_view.dart';
-import 'package:flutter_admin/app/modules/login/onboarding/onboarding_screen.dart';
 import 'package:flutter_admin/firebase_options.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,7 +40,7 @@ class MyApp extends StatelessWidget {
         Locale('lo', 'LA'),
         Locale('en'),
       ],
-      home: const HomeView(),
+      home: HomeView(),
     );
   }
 }

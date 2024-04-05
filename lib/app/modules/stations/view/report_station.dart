@@ -8,15 +8,15 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:intl/intl.dart';
 
-class reportt extends StatefulWidget {
+class reportt_station extends StatefulWidget {
   final String docId; // Assuming you're passing document ID as a String
-  reportt({required this.docId});
+  reportt_station({required this.docId});
 
   @override
-  State<reportt> createState() => _reporttState();
+  State<reportt_station> createState() => _reporttState();
 }
 
-class _reporttState extends State<reportt> {
+class _reporttState extends State<reportt_station> {
   late String _name;
   final formattedDateTime =
       DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.now());
@@ -71,10 +71,10 @@ class _reporttState extends State<reportt> {
 
     // Fetch data from Firestore
     final QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('BusType').get();
+        await FirebaseFirestore.instance.collection('Stations').get();
 
     // Extract data from query snapshot
-    final List<Map<String, dynamic>> busTypeData = querySnapshot.docs
+    final List<Map<String, dynamic>> stationsData = querySnapshot.docs
         .map((doc) => {
               'id': doc.id, // Include the document ID
               ...doc.data() as Map<String, dynamic>, // Include other fields
@@ -125,7 +125,7 @@ class _reporttState extends State<reportt> {
                         ),
                       ),
                       pw.Text(
-                        ' ລາຍງານຂໍ້ມູນປະເພດລົດ',
+                        ' ລາຍງານຂໍ້ມູນສະຖານີ',
                         style: pw.TextStyle(
                           font: font1,
                           fontSize: 25,
@@ -152,7 +152,7 @@ class _reporttState extends State<reportt> {
                       fontSize: 20,
                     ),
                     headers: ['ລະຫັດ', 'ຊື່'],
-                    data: busTypeData
+                    data: stationsData
                         .map((entry) =>
                             [entry['id'].toString(), entry['name'].toString()])
                         .toList(),

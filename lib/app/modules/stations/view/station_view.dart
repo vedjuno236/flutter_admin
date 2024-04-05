@@ -1,7 +1,10 @@
+import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_admin/app/model/stations_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:flutter_admin/app/modules/stations/view/report_station.dart';
 
 import '../../../service/stations_service.dart';
 
@@ -13,6 +16,8 @@ class StationView extends StatefulWidget {
 }
 
 class _StationViewState extends State<StationView> {
+  final TextEditingController textnameController = TextEditingController();
+
   final DatabaseService _databaseService = DatabaseService();
   var _searchQuery = "";
   @override
@@ -62,8 +67,12 @@ class _StationViewState extends State<StationView> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        openDialog();
+                        addStationsDialog();
                       },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.blue, // Background color
+                        onPrimary: Colors.white, // Text color
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -83,7 +92,30 @@ class _StationViewState extends State<StationView> {
                     ),
                     SizedBox(width: 6),
                     ElevatedButton(
-                      onPressed: () {},
+                       onPressed: () async {
+                      try {
+                        final DocumentSnapshot<Map<String, dynamic>> snapshot =
+                            await FirebaseFirestore.instance
+                                .collection('Stations')
+                                .doc('stationsId')
+                                .get();
+                        final docId = snapshot.id;
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => reportt_station(docId: docId),
+                          ),
+                        );
+                      } catch (e) {
+                        print('Error fetching document: $e');
+                        // Handle error appropriately
+                      }
+                    },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.orangeAccent, // Background color
+                        onPrimary: Colors.white, // Text color
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -146,10 +178,9 @@ class _StationViewState extends State<StationView> {
                                 ),
                                 SizedBox(height: 9),
                                 Text(
-                                  'ຊື່: ${stationsData.nume}',
+                                  'ຊື່: ${stationsData.name}',
                                   style: GoogleFonts.notoSansLao(
                                     fontSize: 17,
-                                    color: Colors.blue,
                                   ),
                                 ),
                               ],
@@ -160,8 +191,12 @@ class _StationViewState extends State<StationView> {
                                 PopupMenuItem(
                                   value: 1,
                                   child: ListTile(
-                                    onTap: () {
-                                      EditeDialog();
+                                    onTap: () async {
+                                      Navigator.pop(context);
+                                      textnameController.text =
+                                          stationsData.name;
+                                      EditeStationsDialog(
+                                          context, stationsId, stationsData);
                                     },
                                     leading: const Icon(
                                       Icons.edit,
@@ -177,27 +212,31 @@ class _StationViewState extends State<StationView> {
                                   value: 1,
                                   child: ListTile(
                                     onTap: () {
+                                      Navigator.pop(context);
                                       AwesomeDialog(
                                         context: context,
                                         animType: AnimType.scale,
                                         dialogType: DialogType.info,
                                         body: Center(
                                           child: Text(
-                                            'Are you sure you want to delete?',
+                                            'ຕ້ອງການລົບແມ່ນບໍ່?',
                                             style: GoogleFonts.notoSansLao(
                                                 fontSize: 15),
                                           ),
                                         ),
                                         btnCancelOnPress: () {},
-                                        btnOkOnPress: () {},
-                                      )..show();
+                                        btnOkOnPress: () {
+                                          _databaseService
+                                              .deleteStation(stationsId);
+                                        },
+                                      ).show();
                                     },
                                     leading: const Icon(
                                       Icons.delete,
                                       color: Colors.redAccent,
                                     ),
                                     title: Text(
-                                      'Delete',
+                                      'ລົບ',
                                       style: GoogleFonts.notoSansLao(),
                                     ),
                                   ),
@@ -216,7 +255,16 @@ class _StationViewState extends State<StationView> {
         ));
   }
 
-  Future openDialog() => showDialog(
+  String generateUniqueId() {
+    // Generate a unique ID using a combination of timestamp and random number.
+    // You can adjust this logic based on your specific requirements.
+    int timestamp = DateTime.now().millisecondsSinceEpoch;
+    int random =
+        Random().nextInt(10000); // Adjust 10000 according to your needs
+    return '$timestamp-$random';
+  }
+
+  Future addStationsDialog() => showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: Text(
@@ -227,6 +275,7 @@ class _StationViewState extends State<StationView> {
             ),
           ),
           content: TextField(
+            controller: textnameController,
             decoration: InputDecoration(
               hintText: 'ປ້ອນຂໍ້ມູນສະຖານີ',
               hintStyle: GoogleFonts.notoSansLao(),
@@ -241,7 +290,18 @@ class _StationViewState extends State<StationView> {
           ),
           actions: [
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                // Assuming you have a separate ID for the station
+                String stationId =
+                    generateUniqueId(); // You need to implement `generateUniqueId()`.
+
+                Stations stations =
+                    Stations(id: stationId, name: textnameController.text);
+                _databaseService.addStation(stations);
+
+                Navigator.pop(context);
+                textnameController.clear();
+              },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
                     Colors.blue), // Set your desired background color
@@ -267,7 +327,9 @@ class _StationViewState extends State<StationView> {
         ),
       );
 
-  Future EditeDialog() => showDialog(
+  Future EditeStationsDialog(
+          BuildContext context, String stationsId, Stations stations) =>
+      showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: Text(
@@ -278,6 +340,7 @@ class _StationViewState extends State<StationView> {
             ),
           ),
           content: TextField(
+            controller: textnameController,
             decoration: InputDecoration(
               hintText: 'ປ້ອນຂໍ້ມູນສະຖານີ',
               hintStyle: GoogleFonts.notoSansLao(),
@@ -292,7 +355,14 @@ class _StationViewState extends State<StationView> {
           ),
           actions: [
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Stations updateStations = stations.copyWith(
+                  name: textnameController.text,
+                );
+                _databaseService.updateStations(stationsId, updateStations);
+                Navigator.pop(context);
+                textnameController.clear();
+              },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
                     Colors.redAccent), // Set your desired background color

@@ -1,25 +1,23 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Bustype {
-  String nume;
+  String name;
 
   Bustype({
-   required this.nume,
+    required this.name,
   });
 
-  Bustype.fromJson(Map<String, Object?> json)
-      : this(nume: json['name']! as String);
-
-  
+  Bustype.fromJson(Map<String, dynamic> json)
+      : this(name: json['name']! as String);
 
   Bustype copyWith({
-    String? nume,
+    String? name,
   }) {
-    return Bustype(nume: nume ?? this.nume);
+    return Bustype(name: name ?? this.name);
   }
-  Map<String, Object > toJson() {
+
+  Map<String, dynamic> toJson() {
     return {
-      'nume': nume,
+      'name': name,
     };
   }
 }

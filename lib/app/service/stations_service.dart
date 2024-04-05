@@ -1,6 +1,4 @@
 
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_admin/app/model/stations_model.dart';
 
@@ -30,6 +28,13 @@ class DatabaseService {
 
   void addStation(Stations stations) async {
     _stationsRef.add(stations);
+  }
+   void updateStations(String stationsId,  stations) {
+    _stationsRef.doc(stationsId).update(stations.toJson());
+  }
+
+  void deleteStation(String stationsId) {
+    _stationsRef.doc(stationsId).delete();
   }
 }
 

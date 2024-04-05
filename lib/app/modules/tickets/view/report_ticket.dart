@@ -8,47 +8,27 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:intl/intl.dart';
 
-class reportt extends StatefulWidget {
+class report_ticket extends StatefulWidget {
   final String docId; // Assuming you're passing document ID as a String
-  reportt({required this.docId});
+  report_ticket({required this.docId});
 
   @override
-  State<reportt> createState() => _reporttState();
+  State<report_ticket> createState() => _reporttState();
 }
 
-class _reporttState extends State<reportt> {
+class _reporttState extends State<report_ticket> {
   late String _name;
   final formattedDateTime =
       DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.now());
+  NumberFormat numberFormat =
+      NumberFormat.currency(locale: 'lo_LA', symbol: '₭');
   @override
   void initState() {
     super.initState();
-    fetchDocument();
+    
   }
 
-  Future<void> fetchDocument() async {
-    try {
-      final documentSnapshot = await FirebaseFirestore.instance
-          .collection('BusType')
-          .doc(widget.docId)
-          .get();
-
-      if (documentSnapshot.exists) {
-        setState(() {
-          _name = documentSnapshot.get('name');
-        });
-      } else {
-        setState(() {
-          _name = 'Name not found';
-        });
-      }
-    } catch (e) {
-      print('Error fetching document: $e');
-      setState(() {
-        _name = 'Error: $e';
-      });
-    }
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -71,10 +51,10 @@ class _reporttState extends State<reportt> {
 
     // Fetch data from Firestore
     final QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('BusType').get();
+        await FirebaseFirestore.instance.collection('Tickets').get();
 
     // Extract data from query snapshot
-    final List<Map<String, dynamic>> busTypeData = querySnapshot.docs
+    final List<Map<String, dynamic>> ticketsData = querySnapshot.docs
         .map((doc) => {
               'id': doc.id, // Include the document ID
               ...doc.data() as Map<String, dynamic>, // Include other fields
@@ -118,14 +98,14 @@ class _reporttState extends State<reportt> {
                         ),
                       ),
                       pw.Text(
-                        '     ສະມາຄົມຂົນສົ່ງແຂວງຫຼວງພະບາງ ',
+                        'ສະມາຄົມຂົນສົ່ງແຂວງຫຼວງພະບາງ ',
                         style: pw.TextStyle(
                           font: font1,
                           fontSize: 25,
                         ),
                       ),
                       pw.Text(
-                        ' ລາຍງານຂໍ້ມູນປະເພດລົດ',
+                        ' ລາຍງານຂໍ້ມູນແພັກແກັດ',
                         style: pw.TextStyle(
                           font: font1,
                           fontSize: 25,
@@ -151,10 +131,14 @@ class _reporttState extends State<reportt> {
                       font: font1, // Use bold font for headers
                       fontSize: 20,
                     ),
-                    headers: ['ລະຫັດ', 'ຊື່'],
-                    data: busTypeData
-                        .map((entry) =>
-                            [entry['id'].toString(), entry['name'].toString()])
+                    headers: ['ລະຫັດ', 'ຊື່', 'ລາຄາແພັກແກັດ', 'ລາຄາຈອງ'],
+                    data: ticketsData
+                        .map((entry) => [
+                              entry['id'].toString(),
+                              entry['name'].toString(),
+                              numberFormat.format(entry['price']),
+                              numberFormat.format(entry['booking_price'])
+                            ])
                         .toList(),
                   ),
                 ),

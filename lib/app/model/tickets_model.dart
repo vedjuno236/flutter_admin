@@ -1,10 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Tickets {
   String name;
-  double booking_price; // Changed to double
-  double price; // Changed to double
-
+  int booking_price;
+  int price;
   Tickets({
     required this.name,
     required this.booking_price,
@@ -13,14 +10,14 @@ class Tickets {
   Tickets.fromJson(Map<String, dynamic> json)
       : this(
           name: json['name'] as String? ?? '',
-          booking_price: (json['booking_price'] as num?)?.toDouble() ?? 0.0,
-          price: (json['price'] as num?)?.toDouble() ?? 0.0,
+          booking_price: (json['booking_price'] as num?)?.toInt() ?? 0,
+          price: (json['price'] as num?)?.toInt() ?? 0,
         );
 
   Tickets copyWith({
     String? name,
-    double? booking_price, // Changed to double
-    double? price, // Changed to double
+    int? booking_price,
+    int? price,
   }) {
     return Tickets(
       name: name ?? this.name,

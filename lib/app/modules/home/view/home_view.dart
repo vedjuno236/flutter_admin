@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin/app/modules/Passengers/passengers_view.dart';
 import 'package:flutter_admin/app/modules/booking/view/booking_view.dart';
 import 'package:flutter_admin/app/modules/bus/view/bus_view.dart';
 import 'package:flutter_admin/app/modules/bustype/view/bustype_view.dart';
@@ -20,6 +21,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  int CountPass = 0;
   int codeCount = 0;
   int Countbus = 0;
   int Countstations = 0;
@@ -28,6 +30,17 @@ class _HomeViewState extends State<HomeView> {
   int CountTickets = 0;
   int CounBooking = 0;
   int CountPayment = 0;
+
+  void countFirebasePass() {
+    FirebaseFirestore.instance
+        .collection('Passengers')
+        .get()
+        .then((QuerySnapshot snapshot) {
+      setState(() {
+        CountPass = snapshot.size;
+      });
+    });
+  }
 
   void countFirebaseCodes() {
     FirebaseFirestore.instance
@@ -120,6 +133,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
+    countFirebasePass();
     countFirebaseCodes();
     countFirebasebus();
     countFirebasestations();
@@ -189,10 +203,10 @@ class _HomeViewState extends State<HomeView> {
                           radius: 60,
                           lineWidth: 18.0,
                           percent: 0.4,
-                          backgroundColor: Colors.deepPurple,
+                          backgroundColor: Color.fromARGB(255, 166, 18, 235),
                           progressColor: Colors.blueAccent,
                           circularStrokeCap: CircularStrokeCap.round,
-                          center: const Text("60%"),
+                          center: const Text("60%",style: TextStyle(color: Colors.white),),
                         ),
                         Column(
                           children: [
@@ -204,6 +218,7 @@ class _HomeViewState extends State<HomeView> {
                                       'ການຈອງ/ມື້',
                                       style: GoogleFonts.notoSansLao(
                                         fontSize: 12,
+                                        color: Colors.white
                                       ),
                                     ),
                                     LinearPercentIndicator(
@@ -223,6 +238,8 @@ class _HomeViewState extends State<HomeView> {
                                       'ການຈອງ/ເດືອນ',
                                       style: GoogleFonts.notoSansLao(
                                         fontSize: 12,
+                                        color: Colors.white
+
                                       ),
                                     ),
                                     LinearPercentIndicator(
@@ -249,6 +266,8 @@ class _HomeViewState extends State<HomeView> {
                                       'ລາຍຮັບ/ມື້',
                                       style: GoogleFonts.notoSansLao(
                                         fontSize: 12,
+                                        color: Colors.white
+
                                       ),
                                     ),
                                     LinearPercentIndicator(
@@ -266,8 +285,12 @@ class _HomeViewState extends State<HomeView> {
                                   children: [
                                     Text(
                                       'ລາຍຮັບ/ເດືອນ',
+                                      
                                       style: GoogleFonts.notoSansLao(
                                         fontSize: 12,
+                                        color: Colors.white
+                                        
+
                                       ),
                                     ),
                                     LinearPercentIndicator(
@@ -428,7 +451,7 @@ class _HomeViewState extends State<HomeView> {
                               context,
                               PageTransition(
                                 type: PageTransitionType.rightToLeft,
-                                child: DeparturesView(),
+                                child: DepartureView(),
                               ),
                             );
                           },
@@ -675,7 +698,7 @@ class _HomeViewState extends State<HomeView> {
                               Text(
                                 'ຈໍານວນ: $codeCount /ຄັນ',
                                 style: GoogleFonts.notoSansLao(
-                                    color: Colors.greenAccent),
+                                    color: Colors.blueGrey),
                               ),
                             ],
                           )
@@ -725,7 +748,7 @@ class _HomeViewState extends State<HomeView> {
                               Text(
                                 'ຈໍານວນ: $Countbus /ຄັນ',
                                 style: GoogleFonts.notoSansLao(
-                                    color: Colors.deepOrange),
+                                    color: Colors.blueGrey),
                               ),
                             ],
                           )
@@ -733,6 +756,68 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ),
                   ),
+                  GestureDetector(
+                      onTap: () {
+                            Navigator.push(
+                              context,
+                              PageTransition(
+                                type: PageTransitionType.rightToLeft,
+                                child: PassengersView(),
+                              ),
+                            );
+                          },
+                       child:   Container(
+                    margin: EdgeInsets.only(top: 1, bottom: 5),
+                    width: MediaQuery.of(context).size.width,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Colors.black12,
+                        width: 1,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.blueAccent,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            width: 70,
+                            height: 70,
+                            child: const Icon(
+                              Icons.supervised_user_circle,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'ຂໍ້ມູນຜູ້ໃຊ້',
+                                style: GoogleFonts.notoSansLao(
+                                    fontSize: 17, color: Colors.black38),
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                'ຈໍານວນ: $CountPass /ຄົນ',
+                                style: GoogleFonts.notoSansLao(
+                                    color: Colors.blueGrey),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  ),
+                  
                   Container(
                     margin: EdgeInsets.only(top: 1, bottom: 5),
                     width: MediaQuery.of(context).size.width,
@@ -742,7 +827,7 @@ class _HomeViewState extends State<HomeView> {
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: Colors.black12,
-                        width: 1, // กำหนดความหนาของเส้น
+                        width: 1, 
                       ),
                     ),
                     child: Padding(
@@ -775,7 +860,7 @@ class _HomeViewState extends State<HomeView> {
                               Text(
                                 'ຈໍານວນ: $Countstations /ສະຖານີ',
                                 style: GoogleFonts.notoSansLao(
-                                    color: Colors.redAccent),
+                                    color: Colors.blueGrey),
                               ),
                             ],
                           )
@@ -824,7 +909,7 @@ class _HomeViewState extends State<HomeView> {
                               Text(
                                 'ຈໍານວນ: $CountDepartures /ອອກເດີນທາງ',
                                 style: GoogleFonts.notoSansLao(
-                                    color: Colors.blueAccent),
+                                    color: Colors.blueGrey),
                               ),
                             ],
                           )
@@ -923,7 +1008,7 @@ class _HomeViewState extends State<HomeView> {
                               Text(
                                 'ຈໍານວນ: $CountTickets /ແພັກເກັດ',
                                 style: GoogleFonts.notoSansLao(
-                                    color: Colors.redAccent),
+                                    color: Colors.blueGrey),
                               ),
                             ],
                           )
@@ -972,7 +1057,7 @@ class _HomeViewState extends State<HomeView> {
                               Text(
                                 'ຈໍານວນ: $CounBooking /ການຈອງ',
                                 style: GoogleFonts.notoSansLao(
-                                    color: Colors.orangeAccent),
+                                    color: Colors.blueGrey),
                               ),
                             ],
                           )
@@ -1018,10 +1103,10 @@ class _HomeViewState extends State<HomeView> {
                                     fontSize: 17, color: Colors.black38),
                               ),
                               SizedBox(height: 5),
-                               Text(
+                              Text(
                                 'ຈໍານວນ: $CountPayment /ການຊໍາລະ',
                                 style: GoogleFonts.notoSansLao(
-                                    color: Colors.blueAccent),
+                                    color: Colors.blueGrey),
                               ),
                             ],
                           )
@@ -1235,7 +1320,7 @@ class NavigationDrawer extends StatelessWidget {
                   context,
                   PageTransition(
                     type: PageTransitionType.rightToLeft,
-                    child: DeparturesView(),
+                    child: DepartureView(),
                   ),
                 ); // Closes the drawer
               },
