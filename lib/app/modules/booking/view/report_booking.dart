@@ -68,19 +68,25 @@ class _reporttState extends State<report_booking> {
       List<List<dynamic>> bookingData = booking.map((booking) {
         final book_date =
             DateFormat('dd/MM/yyy HH:mm:ss').format(booking.book_date.toDate());
-        final expired_time =
-            DateFormat('dd/MM/yyy HH:mm:ss').format(booking.expired_time.toDate());
-        final time = DateFormat('dd/MM/yyy HH:mm:ss').format(booking.time.toDate());
+        final expired_time = DateFormat('dd/MM/yyy HH:mm:ss')
+            .format(booking.expired_time.toDate());
+        final time =
+            DateFormat('dd/MM/yyy HH:mm:ss').format(booking.time.toDate());
 
+       
         return [
           book_date,
-          booking.departure_id,
+          booking.departure_id.bus_id.carnamber , 
+          booking.departure_id.route_id.departure_station_id.id,
+          booking.departure_id.route_id.arrival_station_id.id,
+
           expired_time,
           booking.passenger_id.name,
           booking.seat,
           booking.status,
           booking.ticket_id.name,
           time,
+          booking.passenger_id.phoneNumber,
           // booking.user_id,
         ];
       }).toList();
@@ -147,15 +153,17 @@ class _reporttState extends State<report_booking> {
                         fontSize: 10,
                       ),
                       headers: [
-                        'ເວລາຈອງ',
-                        'ລະຫັດອອກເດີນທາງ',
+                        'ປີ້ເລີ່ມຕົ້ນ',
+                        'ລະຫັດລົດ',
+                        'ຕົ້ນທາງ',
+                        'ປາຍທາງ',
                         'ປີ້ໝົດເວລາ',
                         'ຊື່ຜູ້ຈອງ',
                         'ບ່ອນນັ່ງ',
                         'ສະຖານະ',
                         'ປະເພດປີ້',
                         'ເວລາຈອງ',
-                        // 'ລະຫັດຜູ້ໃຊ້',
+                        'ເບີໂທ'
                       ],
                       data: bookingData,
                     ),

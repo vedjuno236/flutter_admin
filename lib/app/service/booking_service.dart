@@ -1,98 +1,4 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter_admin/app/model/booking_model.dart';
 
-// const String TODO_COLLECTION_REF = "Booking";
-// const String TICKET_COLLECTION_REF = "Tickets";
-// const String Passengers_COLLECTION_REF = "Passengers";
-
-// class DatabaseService {
-//   final FirebaseFirestore _firebase = FirebaseFirestore.instance;
-
-//   late final CollectionReference _bookingRef;
-//   late final CollectionReference _ticketsRef;
-//   late final CollectionReference _passengersRef; // Corrected variable name
-
-//   DatabaseService() {
-//     _bookingRef = _firebase.collection(TODO_COLLECTION_REF);
-//     _ticketsRef = _firebase.collection(TICKET_COLLECTION_REF);
-//     _passengersRef = _firebase
-//         .collection(Passengers_COLLECTION_REF); // Corrected variable name
-//   }
-
-//   Stream<List<Booking>> getBooking({String? nameQuery}) {
-//     return _bookingRef.snapshots().asyncMap((querySnapshot) async {
-//       try {
-//         final bookingFutures = querySnapshot.docs.map((bookingDoc) async {
-//           final bookingData = bookingDoc.data() as Map<String, dynamic>?;
-
-//           // print(bookingData);
-//           if (bookingData == null || bookingData.isEmpty) {
-//             return null;
-//           }
-//           if (!bookingData.containsKey('ticket_id')) {
-//             return null;
-//           }
-
-//           final ticketId = bookingData['ticket_id'];
-//           final passengersId = bookingData['passenger_id'];
-//           final departureId = bookingData['departure_id'];
-
-//           // print(ticketId);
-//           // print('pass:$passengersId');
-//           print('departure:$departureId');
-
-//           final ticketDoc = await _ticketsRef.doc(ticketId).get();
-//           final passengersDoc = await _passengersRef.doc(passengersId).get();
-
-//           if (!ticketDoc.exists) {
-//             return null;
-//           }
-//           final ticketData = ticketDoc.data() as Map<String, dynamic>?;
-//           if (ticketData == null || !ticketData.containsKey('name')) {
-//             return null;
-//           }
-
-//           bookingData['id'] = bookingDoc.id;
-//           bookingData.addAll({"ticket_id": ticketData});
-// //
-//           if (!passengersDoc.exists) {
-//             return null;
-//           }
-//           final passengersData = passengersDoc.data() as Map<String, dynamic>?;
-//           if (passengersData == null || !passengersData.containsKey('name')) {
-//             return null;
-//           }
-
-//           bookingData['id'] = bookingDoc.id;
-//           bookingData.addAll({"passenger_id": passengersData});
-
-//           return Booking.fromJson(bookingData);
-//         }).toList();
-
-//         final resolvedBuses = await Future.wait(bookingFutures);
-
-//         // Filtering out null elements and converting to List<Buses>
-//         final filteredBuses = resolvedBuses
-//             .where((booking) => booking != null)
-//             .cast<Booking>()
-//             .toList();
-
-//         // Filtering by name if nameQuery is provided
-//         if (nameQuery != null && nameQuery.isNotEmpty) {
-//           return filteredBuses
-//               .where((booking) => booking.status == nameQuery)
-//               .toList();
-//         } else {
-//           return filteredBuses;
-//         }
-//       } catch (e, stackTrace) {
-//         print('Error fetching buses: $e');
-//         print(stackTrace);
-//         return []; // Returning empty list in case of error
-//       }
-//     });
-//   }
-// }
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_admin/app/model/booking_model.dart';
@@ -103,6 +9,7 @@ const String Passengers_COLLECTION_REF = "Passengers";
 const String DEPARTURES_COLLECTION_REF = "Departures";
 const String ROUTES_COLLECTION_REF = "Routes";
 const String BUSES_COLLECTION_REF = "Buses";
+const String BUSTYPE_COLLECTION_REF = "BusType";
 
 class DatabaseService {
   final FirebaseFirestore _firebase = FirebaseFirestore.instance;
@@ -112,6 +19,7 @@ class DatabaseService {
   late final CollectionReference _busesRef;
   late final CollectionReference _departuresRef;
   late final CollectionReference _routesRef;
+  late final CollectionReference _bustypesRef;
   DatabaseService() {
     _bookingRef = _firebase.collection(TODO_COLLECTION_REF);
     _ticketsRef = _firebase.collection(TICKET_COLLECTION_REF);
@@ -119,6 +27,8 @@ class DatabaseService {
     _departuresRef = _firebase.collection(DEPARTURES_COLLECTION_REF);
     _routesRef = _firebase.collection(ROUTES_COLLECTION_REF);
     _busesRef = _firebase.collection(BUSES_COLLECTION_REF);
+    _bustypesRef = _firebase.collection(BUSTYPE_COLLECTION_REF);
+    
   }
 
   Stream<List<Booking>> getBooking({String? nameQuery}) {
@@ -178,8 +88,11 @@ class DatabaseService {
           // Fetch Buses data and include the 'name' field in bookingData
           final busId = departuresDoc['bus_id'].toString();
           final busDoc = await _busesRef.doc(busId).get();
-
           final busData = busDoc.data() as Map<String, dynamic>?;
+
+          final busTypeDoc =
+              await _bustypesRef.doc(busData?['bus_type_id'].toString()).get();
+          final busTypeData = busTypeDoc.data() as Map<String, dynamic>?;
 
           if (busData == null ||
               !busData.containsKey('bus_type_id') ||
@@ -188,23 +101,14 @@ class DatabaseService {
             return null;
           }
 
-          final busTypeData = busData['bus_type_id']; 
-
           busData['bus_type_id'] = busTypeData;
-          final dep = departuresDoc.data() as Map<String, dynamic>;
-          dep['bus_id'] = busData;
-
-          dep['bus_id'] = busData;
-          bookingData['departure_id'] = dep;
-
-          bookingData['id'] = departuresDoc.id;
-
-          bookingData['route_id'] = routeData;
-          bookingData['route_id']['arrival_station_id'] = arrivalStationName;
-          bookingData['route_id']['departure_station_id'] =
-              departureStationName;
-          // print('departureStationName:$departureStationName');
-          // print('arrivalStationName:$arrivalStationName');
+          routeData['arrival_station_id'] = arrivalStationName;
+          routeData['departure_station_id'] = departureStationName;
+          final departuresData = departuresDoc.data() as Map<String, dynamic>;
+          departuresData['bus_id'] = busData;
+          departuresData['route'] = routeData;
+       
+          bookingData['departure_id'] = departuresData;
 
           final ticketData = ticketDoc.data() as Map<String, dynamic>?;
           final passengersData = passengersDoc.data() as Map<String, dynamic>?;
@@ -216,19 +120,14 @@ class DatabaseService {
 
           bookingData['ticket_id'] = ticketData;
           bookingData['departure_id'] = departuresIdData;
-          bookingData['passengers_id'] = passengersData;
+          bookingData['passenger_id'] = passengersData;
 
-          bookingData['departure_id'] = dep;
-          // print('dep:$dep');
-
-          // print('ticketData:$ticketData');
-          // print('passengersData:$passengersData');
+          bookingData['departure_id'] = departuresData;
+          bookingData['id'] = bookingDoc.id;
 
           return Booking.fromJson(bookingData);
         }).toList();
         final resolvedBookings = await Future.wait(bookingFutures);
-
-        // print('resolvedBookings:$resolvedBookings');
 
         final filteredBookings = resolvedBookings
             .where((booking) => booking != null)

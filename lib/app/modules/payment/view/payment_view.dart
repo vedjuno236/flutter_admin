@@ -115,132 +115,124 @@ class _PaymentViewState extends State<PaymentView> {
               SizedBox(height: 10),
               Container(
                   child: Expanded(
-                      child:StreamBuilder(
-                  stream: _databaseService.getpayment(nameQuery: _searchQuery),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text('Error: ${snapshot.error}'),
-                      );
-                    }
-                    List payment = snapshot.data?.docs ?? [];
-                    if (payment.isEmpty) {
-                      return Center(
-                        child: Text(
-                          'ບໍ່ມີຂໍ້ມູນ.',
-                          style: GoogleFonts.notoSansLao(fontSize: 15),
-                        ),
-                      );
-                    }
-                    return ListView.builder(
-                      itemCount: payment.length,
-                      itemBuilder: (context, index) {
-                        Payment paymentData = payment[index].data();
-                        String paymentId = payment[index].id;
-                                return Card(
-                                  child: ListTile(
-                                    title: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'ລະຫັດ: $paymentId',
-                                          style: GoogleFonts.notoSansLao(
-                                              fontSize: 15),
-                                        ),
-                                        Text(
-                                          'ລະຫັດການຈອງ: ${paymentData.booking_id}',
-                                          style: GoogleFonts.notoSansLao(
-                                              fontSize: 17),
-                                        ),
-                                        Text(
-                                          'ຄໍາອະທຶບາຍ: ${paymentData.description}',
-                                          style: GoogleFonts.notoSansLao(
-                                              fontSize: 17),
-                                        ),
-                                        SizedBox(height: 9),
-                                        Text(
-                                          'ເວລາການຊໍາລະ: ${DateFormat("dd-MM-yyyy h:mm a").format(paymentData.pay_date.toDate())}',
-                                          style: GoogleFonts.notoSansLao(
-                                              fontSize: 17),
-                                        ),
-                                        Text(
-                                          'ຊໍາລະດ້ວຍ: ${paymentData.payment_method}',
-                                          style: GoogleFonts.notoSansLao(
-                                              fontSize: 17),
-                                        ),
-                                        Text(
-                                          'ເງີນລວມ: ${numberFormat.format(paymentData.total)}',
-                                          style: GoogleFonts.notoSansLao(
-                                              fontSize: 17),
-                                        ),
-                                        Text(
-                                          'ລະຫັດຜູ້ຊໍາລະ ${paymentData.user_id}',
-                                          style: GoogleFonts.notoSansLao(
-                                              fontSize: 17),
-                                        ),
-                                      ],
-                                    ),
-                                    trailing: PopupMenuButton(
-                                      icon: Icon(Icons.more_vert),
-                                      itemBuilder: (context) => [
-                                        PopupMenuItem(
-                                          value: 1,
-                                          child: ListTile(
-                                            onTap: () {
-                                              EditeDialog();
-                                            },
-                                            leading: const Icon(
-                                              Icons.edit,
-                                              color: Colors.orangeAccent,
-                                            ),
-                                            title: Text(
-                                              'ແກ້ໄຂ',
-                                              style: GoogleFonts.notoSansLao(),
-                                            ),
+                      child: StreamBuilder<List<Payment>>(
+                          stream: _databaseService.getpayment(
+                              nameQuery: _searchQuery),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                  child: Text('Error: ${snapshot.error}'));
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return Center(child: Text('No payment found.'));
+                            } else {
+                              return ListView.builder(
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  final paymentData = snapshot.data![index];
+
+                                  String paymentId = paymentData.id;
+                                  return Card(
+                                    child: ListTile(
+                                      title: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'ລະຫັດ: $paymentId',
+                                            style: GoogleFonts.notoSansLao(
+                                                fontSize: 15),
                                           ),
+                                          Text(
+                                            'ລະຫັດການຈອງ: ',
+                                            style: GoogleFonts.notoSansLao(
+                                                fontSize: 17),
+                                          ),
+                                          Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children:
+                                            paymentData.booking_id.map((booking) {
+                                            return Text(
+                                              '  ${booking.status}', // Assuming ticket has a name property
+                                              style: GoogleFonts.notoSans(
+                                                  fontSize: 16),
+                                            );
+                                          }).toList(),
                                         ),
-                                        PopupMenuItem(
-                                          value: 1,
-                                          child: ListTile(
-                                            onTap: () {
-                                              AwesomeDialog(
-                                                context: context,
-                                                animType: AnimType.scale,
-                                                dialogType: DialogType.info,
-                                                body: Center(
-                                                  child: Text(
-                                                    'Are you sure you want to delete?',
-                                                    style:
-                                                        GoogleFonts.notoSansLao(
-                                                            fontSize: 15),
+                                          Text(
+                                            'ຄໍາອະທຶບາຍ: ${paymentData.description}',
+                                            style: GoogleFonts.notoSansLao(
+                                                fontSize: 17),
+                                          ),
+                                          SizedBox(height: 9),
+                                          Text(
+                                            'ເວລາການຊໍາລະ: ${DateFormat("dd-MM-yyyy h:mm a").format(paymentData.pay_date.toDate())}',
+                                            style: GoogleFonts.notoSansLao(
+                                                fontSize: 17),
+                                          ),
+                                          Text(
+                                            'ຊໍາລະດ້ວຍ: ${paymentData.payment_method}',
+                                            style: GoogleFonts.notoSansLao(
+                                                fontSize: 17),
+                                          ),
+                                          Text(
+                                            'ເງີນລວມ: ${numberFormat.format(paymentData.total)}',
+                                            style: GoogleFonts.notoSansLao(
+                                                fontSize: 17),
+                                          ),
+                                          Text(
+                                            'ລະຫັດຜູ້ຊໍາລະ ${paymentData.user_id}',
+                                            style: GoogleFonts.notoSansLao(
+                                                fontSize: 17),
+                                          ),
+                                        ],
+                                      ),
+                                      trailing: PopupMenuButton(
+                                        icon: Icon(Icons.more_vert),
+                                        itemBuilder: (context) => [
+                                        
+                                          PopupMenuItem(
+                                            value: 1,
+                                            child: ListTile(
+                                              onTap: () {
+                                                AwesomeDialog(
+                                                  context: context,
+                                                  animType: AnimType.scale,
+                                                  dialogType: DialogType.info,
+                                                  body: Center(
+                                                    child: Text(
+                                                      'Are you sure you want to delete?',
+                                                      style: GoogleFonts
+                                                          .notoSansLao(
+                                                              fontSize: 15),
+                                                    ),
                                                   ),
-                                                ),
-                                                btnCancelOnPress: () {},
-                                                btnOkOnPress: () {},
-                                              ).show();
-                                            },
-                                            leading: const Icon(
-                                              Icons.delete,
-                                              color: Colors.redAccent,
-                                            ),
-                                            title: Text(
-                                              'Delete',
-                                              style: GoogleFonts.notoSansLao(),
+                                                  btnCancelOnPress: () {},
+                                                  btnOkOnPress: () {},
+                                                ).show();
+                                              },
+                                              leading: const Icon(
+                                                Icons.delete,
+                                                color: Colors.redAccent,
+                                              ),
+                                              title: Text(
+                                                'Delete',
+                                                style:
+                                                    GoogleFonts.notoSansLao(),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                            );
+                                  );
+                                },
+                              );
+                            }
                           })))
             ])));
   }

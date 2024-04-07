@@ -145,6 +145,7 @@ class _BookingViewState extends State<BookingView> {
 
                               String bookingId = bookingData.id;
 
+                    
                               return Card(
                                 child: ListTile(
                                   title: Column(
@@ -164,19 +165,18 @@ class _BookingViewState extends State<BookingView> {
                                         ),
                                       ),
                                       Text(
-                                        'ລະຫັດອອກເດີນທາງ:${bookingData.departure_id.route_id.departure_station_id.name} -> ${bookingData.departure_id.route_id.arrival_station_id.name}',
+                                        'ລະຫັດລົດ:${bookingData.departure_id.bus_id.carnamber} ',
                                         style: GoogleFonts.notoSansLao(
                                           fontSize: 16,
                                         ),
                                       ),
-                                      // Text(
-                                      //   'ລະຫັດອອກເດີນທາງ:${bookingData.departure_id}',
-                                      //   style: GoogleFonts.notoSansLao(
-                                      //     fontSize: 16,
-                                      //   ),
-                                      // ),
-
-
+                                       Text(
+                                        'ເສັ້ນທາງ:${bookingData.departure_id.route_id.departure_station_id.id} -> ${bookingData.departure_id.route_id.arrival_station_id.id}',
+                                        style: GoogleFonts.notoSansLao(
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      
                                      
                                       Text(
                                         'ເວລາໝົດກໍານົດຂອງປີ້: ${DateFormat("dd-MM-yyyy h:mm a").format(bookingData.expired_time.toDate())}',
