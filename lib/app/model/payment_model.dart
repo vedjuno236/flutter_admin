@@ -36,7 +36,7 @@ class Payment {
         id = json?['id'] as String? ?? '',
         booking_id =
             (json?['booking_id'] as List<dynamic>?)?.map((bookingJson) {
-                  print('bookingJson: $bookingJson');
+                 
                   return Booking.fromJson(bookingJson as Map<String, dynamic>);
                 }).toList() ??
                 [
@@ -90,10 +90,42 @@ class Payment {
               ),
                       )
                 ];
+                  static Future<Departures> fromJsonWithStationNames(
+      Map<String, dynamic> json) async {
+    String arrivalStationName =
+        await fetchStationName(json['route']['arrival_station_id'] as String);
+    String departureStationName =
+        await fetchStationName(json['route']['departure_station_id'] as String);
+
+    return Departures.fromJson({
+      ...json,
+      'route': {
+        ...json['route'],
+        'arrival_station_id': {
+          ...json['route']['arrival_station_id'],
+          'name': arrivalStationName,
+        },
+        'departure_station_id': {
+          ...json['route']['departure_station_id'],
+          'name': departureStationName,
+        },
+      },
+    });
+  }
+
+  // Static method to fetch station name from Firestore
+  static Future<String> fetchStationName(String stationId) async {
+    DocumentSnapshot stationSnapshot = await FirebaseFirestore.instance
+        .collection('Stations')
+        .doc(stationId)
+        .get();
+    return stationSnapshot.exists ? stationSnapshot.get('name') : '';
+  }
 
   Map<String, dynamic> toJson() {
     return {
-      'booking_id': booking_id,
+    
+       'booking_id': booking_id.map((booking) => booking.toJson()).toList(),
       'description': description,
       'pay_date': pay_date,
       'payment_method': payment_method,
