@@ -2,6 +2,8 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_admin/app/model/payment_model.dart';
+import 'package:flutter_admin/app/service/payment_service.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -27,32 +29,8 @@ class _ReportPaymentState extends State<report_payment> {
   @override
   void initState() {
     super.initState();
-    fetchPaymentData();
   }
 
-Future<void> fetchPaymentData() async {
-  final QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Payment').get();
-
-  paymentData = [];
-  for (var doc in querySnapshot.docs) {
-    final bookingIds = List<String>.from(doc['booking_id']);
-    final bookingDetails = await Future.wait(
-      bookingIds.map((bookingId) async {
-        final bookingDoc = await FirebaseFirestore.instance.collection('Booking').doc(bookingId).get();
-        return bookingDoc.exists ? bookingDoc.data() : null;
-      }),
-    );
-
-    for (var i = 0; i < bookingDetails.length; i++) {
-      final paymentEntry = {
-        'id': doc.id,
-        ...doc.data() as Map<String, dynamic>,
-      };
-      paymentData.add(paymentEntry);
-    }
-  }
-  setState(() {});
-}
 
 
   @override
@@ -68,9 +46,38 @@ Future<void> fetchPaymentData() async {
 
     final font1 = pw.Font.ttf(await rootBundle.load('fonts/BoonHome-400.ttf'));
 
-    Uint8List logoData =
-        (await rootBundle.load('assets/images/logo.png')).buffer.asUint8List();
+   try {
+      // Create an instance of DatabaseService
+      DatabaseService databaseService = DatabaseService();
 
+      // Fetch bus data using DatabaseService
+      final List<Payment> booking = await databaseService.getPayment().first;
+
+      // Convert logo image
+      Uint8List logoData = (await rootBundle.load('assets/images/logo.png'))
+          .buffer
+          .asUint8List();
+
+      List<List<dynamic>> paymentData = booking.map((booking) {
+        final book_date =
+            DateFormat('dd/MM/yyy HH:mm:ss').format(booking.book_date.toDate());
+        final expired_time = DateFormat('dd/MM/yyy HH:mm:ss')
+            .format(booking.expired_time.toDate());
+        final time =
+            DateFormat('dd/MM/yyy HH:mm:ss').format(booking.time.toDate());
+paymentData.booking_id
+                                                .map((booking) {
+                                              final passname =
+                                                  booking.passenger_id.name;
+
+                                              final passid =
+                                                  booking.passenger_id.phoneNumber;
+        return [
+         
+         
+        ];
+      }).toList();
+   }
     doc.addPage(
       pw.Page(
         pageTheme: pw.PageTheme(
