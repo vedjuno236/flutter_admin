@@ -157,19 +157,21 @@ class _BookingViewState extends State<BookingView> {
                                         style: GoogleFonts.notoSansLao(
                                             fontSize: 15),
                                       ),
-                                      SizedBox(height: 9),
+                                       Divider(),
                                       Text(
                                         'ເວລາຈອງ: ${DateFormat("dd-MM-yyyy h:mm a").format(bookingData.book_date.toDate())}',
                                         style: GoogleFonts.notoSansLao(
                                           fontSize: 16,
                                         ),
                                       ),
+                                       Divider(),
                                       Text(
                                         'ລະຫັດລົດ:${bookingData.departure_id.bus_id.carnamber} ',
                                         style: GoogleFonts.notoSansLao(
                                           fontSize: 16,
                                         ),
                                       ),
+                                       Divider(),
                                        Text(
                                         'ເສັ້ນທາງ:${bookingData.departure_id.route_id.departure_station_id.id} -> ${bookingData.departure_id.route_id.arrival_station_id.id}',
                                         style: GoogleFonts.notoSansLao(
@@ -177,43 +179,76 @@ class _BookingViewState extends State<BookingView> {
                                         ),
                                       ),
                                       
-                                     
+                                      Divider(),
                                       Text(
                                         'ເວລາໝົດກໍານົດຂອງປີ້: ${DateFormat("dd-MM-yyyy h:mm a").format(bookingData.expired_time.toDate())}',
                                         style: GoogleFonts.notoSansLao(
                                           fontSize: 16,
                                         ),
                                       ),
+                                       Divider(),
                                       Text(
                                         'ລະຫັດຜູ້ໂດຍສານ: ${bookingData.passenger_id.name}',
                                         style: GoogleFonts.notoSansLao(
                                           fontSize: 16,
                                         ),
                                       ),
+                                      Divider(),
                                       Text(
                                         'ໝາຍເລກບ່ອນນັ່ງ: ${bookingData.seat}',
                                         style: GoogleFonts.notoSansLao(
                                           fontSize: 16,
                                         ),
                                       ),
-                                      Text(
-                                        'ສະຖານະ: ${bookingData.status}',
+                                       Divider(),
+                                     
+                                      Row(
+                                        children: [
+                                           Text(
+                                        'ສະຖານະ: ',
                                         style: GoogleFonts.notoSansLao(
                                           fontSize: 16,
                                         ),
                                       ),
+                                    const   SizedBox(width: 10),
+                                          Container(
+                                            padding:const  EdgeInsets.all(
+                                                10), 
+                                            decoration: BoxDecoration(
+                                              color: Colors
+                                                  .blue, 
+                                              border: Border.all(
+                                                  color: Colors
+                                                      .blue), 
+                                              borderRadius: BorderRadius.circular(
+                                                  10),
+                                            ),
+                                            child: Text(
+                                              ' ${bookingData.status}',
+                                              style: GoogleFonts.notoSansLao(
+                                                fontSize: 16,
+                                                color: Colors
+                                                    .white, 
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                       Divider(),
                                       Text(
                                         'ລະຫັດອແພັກເກັດ: ${bookingData.ticket_id.name} ${numberFormat.format(bookingData.ticket_id.price)}',
                                         style: GoogleFonts.notoSansLao(
                                           fontSize: 16,
                                         ),
                                       ),
+                                       Divider(),
                                       Text(
                                         'ເວລາການຈອງ: ${DateFormat("dd-MM-yyyy h:mm a").format(bookingData.time.toDate())}',
                                         style: GoogleFonts.notoSansLao(
                                           fontSize: 16,
                                         ),
                                       ),
+                                       Divider(),
                                       Text(
                                         'ລະຫັດຜູ້ໃຊ້:  ${bookingData.passenger_id.phoneNumber}',
                                         style: GoogleFonts.notoSansLao(

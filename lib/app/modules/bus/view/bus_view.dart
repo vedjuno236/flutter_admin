@@ -246,8 +246,6 @@ class _BusViewState extends State<BusView> {
                                             );
                                           }).toList(),
                                         ),
-                                        SizedBox(height: 8),
-                                        Divider(),
                                       ],
                                     ),
                                     trailing: PopupMenuButton(

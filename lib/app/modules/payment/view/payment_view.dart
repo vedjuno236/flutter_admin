@@ -116,7 +116,7 @@ class _PaymentViewState extends State<PaymentView> {
               Container(
                   child: Expanded(
                       child: StreamBuilder<List<Payment>>(
-                          stream: _databaseService.getpayment(
+                          stream: _databaseService.getPayment(
                               nameQuery: _searchQuery),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
@@ -141,49 +141,105 @@ class _PaymentViewState extends State<PaymentView> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            'ລະຫັດ: $paymentId',
-                                            style: GoogleFonts.notoSansLao(
-                                                fontSize: 15),
-                                          ),
+                                         
                                           Text(
                                             'ລະຫັດການຈອງ: ',
                                             style: GoogleFonts.notoSansLao(
                                                 fontSize: 17),
                                           ),
+                                         Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: paymentData.booking_id
+                                                .map((booking) {
+                                              final busid =
+                                                  booking.departure_id.bus_id.name;
+
+                                              final carbus =
+                                               booking .departure_id.bus_id.carnamber;
+                                              
+                                              return Text(
+                                                '  $busid : $carbus',
+                                                style: GoogleFonts.notoSans(
+                                                    fontSize: 16),
+                                              );
+                                            }).toList(),
+                                          ),
+                                          Divider(),
+                                           Text(
+                                            'ລະຫັດແພັກແກັດ: ',
+                                            style: GoogleFonts.notoSansLao(
+                                                fontSize: 17),
+                                          ),
+                                        
+                                         Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: paymentData.booking_id
+                                                .map((booking) {
+                                              final ticketid =
+                                                  booking.ticket_id.name;
+
+                                              final ticketname =
+                                               booking .ticket_id.price;
+                                              
+                                              return Text(
+                                                '  $ticketid : $ticketname',
+                                                style: GoogleFonts.notoSans(
+                                                    fontSize: 16),
+                                              );
+                                            }).toList(),
+                                          ),
+
+                                          Divider(),
+                                            Text(
+                                            'ລະຫັດເດີນທາງ: ',
+                                            style: GoogleFonts.notoSansLao(
+                                                fontSize: 17),
+                                          ),
                                           Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children:
-                                            paymentData.booking_id.map((booking) {
-                                            return Text(
-                                              '  ${booking.status}', // Assuming ticket has a name property
-                                              style: GoogleFonts.notoSans(
-                                                  fontSize: 16),
-                                            );
-                                          }).toList(),
-                                        ),
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: paymentData.booking_id
+                                                .map((booking) {
+                                              final departureId =
+                                                  booking.departure_id.route_id.departure_station_id.id;
+
+                                              final arrivalId =
+                                               booking .departure_id.route_id  .arrival_station_id .id;
+                                              print(
+                                                  'ຕົ້ນທາງ: $departureId, ປາຍທາງ: $arrivalId');
+                                              return Text(
+                                                ' ຕົ້ນທາງ:  $departureId ->ປາຍທາງ: $arrivalId',
+                                                style: GoogleFonts.notoSans(
+                                                    fontSize: 16),
+                                              );
+                                            }).toList(),
+                                          ),
                                           Text(
                                             'ຄໍາອະທຶບາຍ: ${paymentData.description}',
                                             style: GoogleFonts.notoSansLao(
                                                 fontSize: 17),
                                           ),
-                                          SizedBox(height: 9),
+                                           Divider(),
                                           Text(
                                             'ເວລາການຊໍາລະ: ${DateFormat("dd-MM-yyyy h:mm a").format(paymentData.pay_date.toDate())}',
                                             style: GoogleFonts.notoSansLao(
                                                 fontSize: 17),
                                           ),
+                                             Divider(),
                                           Text(
                                             'ຊໍາລະດ້ວຍ: ${paymentData.payment_method}',
                                             style: GoogleFonts.notoSansLao(
                                                 fontSize: 17),
                                           ),
+                                             Divider(),
                                           Text(
                                             'ເງີນລວມ: ${numberFormat.format(paymentData.total)}',
                                             style: GoogleFonts.notoSansLao(
                                                 fontSize: 17),
                                           ),
+                                             Divider(),
                                           Text(
                                             'ລະຫັດຜູ້ຊໍາລະ ${paymentData.user_id}',
                                             style: GoogleFonts.notoSansLao(
@@ -194,7 +250,6 @@ class _PaymentViewState extends State<PaymentView> {
                                       trailing: PopupMenuButton(
                                         icon: Icon(Icons.more_vert),
                                         itemBuilder: (context) => [
-                                        
                                           PopupMenuItem(
                                             value: 1,
                                             child: ListTile(
