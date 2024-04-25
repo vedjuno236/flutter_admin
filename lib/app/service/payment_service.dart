@@ -37,7 +37,6 @@ class DatabaseService {
             for (String bookingId in bookingIds) {
               final booking.DatabaseService _databasebookingService =
                   booking.DatabaseService();
-              // print('Fetching booking data for booking ID: $bookingId');
               final bookings = await _databasebookingService
                   .getBooking(nameQuery: bookingId)
                   .first;
@@ -56,8 +55,13 @@ class DatabaseService {
               }
             }
             paymentData['booking_id'] = bookingList;
-            debugPrint('bookingList:${bookingList[0]}', wrapWidth: 1024);
-            return Payment.fromJson(paymentData);
+           
+            // debugPrint('bookingList: ${bookingList[0]}', wrapWidth: 1024);
+            Payment payment = Payment.fromJson(paymentData);
+
+            debugPrint(
+                'First booking_id: ${payment.booking_id[0].departure_id.route_id.toJson()}');
+            return payment;
           } catch (e) {
             print('Error processing payment: $e');
             return null;

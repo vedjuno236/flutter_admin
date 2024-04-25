@@ -314,7 +314,6 @@ class _PaymentViewState extends State<PaymentView> {
                           })))
             ])));
   }
-
   Future EditeDialog() => showDialog(
         context: context,
         builder: (context) => AlertDialog(

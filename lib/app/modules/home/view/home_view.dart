@@ -1,14 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_admin/app/modules/Passengers/passengers_view.dart';
 import 'package:flutter_admin/app/modules/booking/view/booking_view.dart';
 import 'package:flutter_admin/app/modules/bus/view/bus_view.dart';
 import 'package:flutter_admin/app/modules/bustype/view/bustype_view.dart';
 import 'package:flutter_admin/app/modules/departures/view/departures_view.dart';
+import 'package:flutter_admin/app/modules/home/view/scaner.dart';
+import 'package:flutter_admin/app/modules/home/view/scannner.dart';
 import 'package:flutter_admin/app/modules/payment/view/payment_view.dart';
 import 'package:flutter_admin/app/modules/routes/view/routes_view.dart';
 import 'package:flutter_admin/app/modules/stations/view/station_view.dart';
 import 'package:flutter_admin/app/modules/tickets/view/tickets_view.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:page_transition/page_transition.dart';
@@ -30,7 +34,7 @@ class _HomeViewState extends State<HomeView> {
   int CountTickets = 0;
   int CounBooking = 0;
   int CountPayment = 0;
-
+  String _scanBarcodeResult = '';
   void countFirebasePass() {
     FirebaseFirestore.instance
         .collection('Passengers')
@@ -130,6 +134,25 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
+  void scnQR() async {
+    String barcodeScanRes;
+    try {
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          "#ff6666", "cancel", true, ScanMode.QR);
+    } on PlatformException {
+      barcodeScanRes = "Failed to get platform version";
+    }
+    setState(() {
+      _scanBarcodeResult = barcodeScanRes;
+    });
+  }
+
+  Future _openSanner(BuildContext context) async {
+    final result = await Navigator.push(
+        context, MaterialPageRoute(builder: (c) => Scannner()));
+    _result = result;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -143,6 +166,8 @@ class _HomeViewState extends State<HomeView> {
     countFirebaseBooking();
     countFirebasePayment();
   }
+
+  String? _result;
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +231,10 @@ class _HomeViewState extends State<HomeView> {
                           backgroundColor: Color.fromARGB(255, 166, 18, 235),
                           progressColor: Colors.blueAccent,
                           circularStrokeCap: CircularStrokeCap.round,
-                          center: const Text("60%",style: TextStyle(color: Colors.white),),
+                          center: const Text(
+                            "60%",
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                         Column(
                           children: [
@@ -217,9 +245,7 @@ class _HomeViewState extends State<HomeView> {
                                     Text(
                                       'ການຈອງ/ມື້',
                                       style: GoogleFonts.notoSansLao(
-                                        fontSize: 12,
-                                        color: Colors.white
-                                      ),
+                                          fontSize: 12, color: Colors.white),
                                     ),
                                     LinearPercentIndicator(
                                       width: 100,
@@ -237,10 +263,7 @@ class _HomeViewState extends State<HomeView> {
                                     Text(
                                       'ການຈອງ/ເດືອນ',
                                       style: GoogleFonts.notoSansLao(
-                                        fontSize: 12,
-                                        color: Colors.white
-
-                                      ),
+                                          fontSize: 12, color: Colors.white),
                                     ),
                                     LinearPercentIndicator(
                                       width: 100,
@@ -265,10 +288,7 @@ class _HomeViewState extends State<HomeView> {
                                     Text(
                                       'ລາຍຮັບ/ມື້',
                                       style: GoogleFonts.notoSansLao(
-                                        fontSize: 12,
-                                        color: Colors.white
-
-                                      ),
+                                          fontSize: 12, color: Colors.white),
                                     ),
                                     LinearPercentIndicator(
                                       width: 100,
@@ -285,13 +305,8 @@ class _HomeViewState extends State<HomeView> {
                                   children: [
                                     Text(
                                       'ລາຍຮັບ/ເດືອນ',
-                                      
                                       style: GoogleFonts.notoSansLao(
-                                        fontSize: 12,
-                                        color: Colors.white
-                                        
-
-                                      ),
+                                          fontSize: 12, color: Colors.white),
                                     ),
                                     LinearPercentIndicator(
                                       width: 100,
@@ -318,9 +333,44 @@ class _HomeViewState extends State<HomeView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    '',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Navigator.push(
+                      //   context,
+                      //   PageTransition(
+                      //     type: PageTransitionType.rightToLeft,
+                      //     child: QRViewExample(),
+                      //   ),
+                      // );
+                      _openSanner(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.redAccent, // Background color
+                      onPrimary: Colors.white, // Text color
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'ສະແກນ QR ປີ້',
+                          style: GoogleFonts.notoSansLao(),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        // Image.asset(
+                        //   'assets/images/QR.png', // Replace 'assets/your_image.png' with your image path
+                        //   width: 25,
+                        //   height: 25,
+                        // ),
+                        const Icon(
+                          Icons
+                              .center_focus_strong, // Specify the icon you want to use
+                          size: 25,
+                          color: Colors.white, // Icon color
+                        ),
+                      ],
+                    ),
                   ),
                   Text(
                     'ລາຍການຈັດການຂໍ້ມູນ',
@@ -333,7 +383,7 @@ class _HomeViewState extends State<HomeView> {
               ),
               const SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.all(5.0),
+                padding: const EdgeInsets.all(0.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -757,67 +807,66 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
                   GestureDetector(
-                      onTap: () {
-                            Navigator.push(
-                              context,
-                              PageTransition(
-                                type: PageTransitionType.rightToLeft,
-                                child: PassengersView(),
-                              ),
-                            );
-                          },
-                       child:   Container(
-                    margin: EdgeInsets.only(top: 1, bottom: 5),
-                    width: MediaQuery.of(context).size.width,
-                    height: 90,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: Colors.black12,
-                        width: 1,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          type: PageTransitionType.rightToLeft,
+                          child: PassengersView(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(top: 1, bottom: 5),
+                      width: MediaQuery.of(context).size.width,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.black12,
+                          width: 1,
+                        ),
                       ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.blueAccent,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            width: 70,
-                            height: 70,
-                            child: const Icon(
-                              Icons.supervised_user_circle,
-                              color: Colors.white,
-                              size: 30,
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'ຂໍ້ມູນຜູ້ໃຊ້',
-                                style: GoogleFonts.notoSansLao(
-                                    fontSize: 17, color: Colors.black38),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Row(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.blueAccent,
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              SizedBox(height: 5),
-                              Text(
-                                'ຈໍານວນ: $CountPass /ຄົນ',
-                                style: GoogleFonts.notoSansLao(
-                                    color: Colors.blueGrey),
+                              width: 70,
+                              height: 70,
+                              child: const Icon(
+                                Icons.supervised_user_circle,
+                                color: Colors.white,
+                                size: 30,
                               ),
-                            ],
-                          )
-                        ],
+                            ),
+                            SizedBox(width: 10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'ຂໍ້ມູນຜູ້ໃຊ້',
+                                  style: GoogleFonts.notoSansLao(
+                                      fontSize: 17, color: Colors.black38),
+                                ),
+                                SizedBox(height: 5),
+                                Text(
+                                  'ຈໍານວນ: $CountPass /ຄົນ',
+                                  style: GoogleFonts.notoSansLao(
+                                      color: Colors.blueGrey),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  ),
-                  
                   Container(
                     margin: EdgeInsets.only(top: 1, bottom: 5),
                     width: MediaQuery.of(context).size.width,
@@ -827,7 +876,7 @@ class _HomeViewState extends State<HomeView> {
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: Colors.black12,
-                        width: 1, 
+                        width: 1,
                       ),
                     ),
                     child: Padding(
