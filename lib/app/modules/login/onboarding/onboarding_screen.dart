@@ -22,9 +22,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   int _currentPage = 0;
   List colors = const [
-    Color(0xffDAD3C8),
-    Color(0xffFFE5DE),
-    Color(0xffDCF6E6),
+    Color.fromARGB(255, 255, 255, 255),
+    Color.fromARGB(255, 250, 250, 250),
+    Color.fromARGB(255, 255, 255, 255),
   ];
 
   AnimatedContainer _buildDots({
@@ -79,13 +79,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           textAlign: TextAlign.center,
                           style: GoogleFonts.notoSansLao(
                               fontSize: (width <= 550) ? 28 : 30,
-                              color: Colors.black38),
+                              color: Colors.black),
                         ),
                         const SizedBox(height: 15),
                         Text(
                           contents[i].desc,
                           style: GoogleFonts.notoSansLao(
-                              fontSize: 20, color: Colors.black38),
+                              fontSize: 20, color: Colors.black),
                           textAlign: TextAlign.center,
                         )
                       ],
@@ -122,7 +122,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               );
                             },
                             child: Text(
-                              "ລົງທະບຽນ",
+                              "ເຂົ້າສູ່ລະບົບ",
                               selectionColor: Colors.white,
                             ),
                             style: ElevatedButton.styleFrom(
@@ -169,7 +169,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     curve: Curves.easeIn,
                                   );
                                 },
-                                child: Text(
+                                child:const  Text(
                                   "ໄປໜ້າ",
                                   selectionColor: Colors.white,
                                 ),

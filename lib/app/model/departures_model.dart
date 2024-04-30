@@ -32,9 +32,7 @@ class Departures {
                     ? int.tryParse(json['bus_id']['capacityVip']) ?? 0
                     : json['bus_id']['capacityVip'] ?? 0,
                 ticketId: (json['bus_id']['ticket'] as List<dynamic>?)
-                        ?.whereType<
-                            Map<String,
-                                dynamic>>() 
+                        ?.whereType<Map<String, dynamic>>()
                         ?.map<Tickets>((e) => Tickets.fromJson(e))
                         .toList() ??
                     [],
@@ -53,37 +51,59 @@ class Departures {
                 id: json['route']['id'] as String? ?? '',
                 arrival_station_id: Stations(
                   id: json['route']['arrival_station_id'] as String? ?? '',
-                  // Default name is empty string
+// Default name is empty string
                   name: '',
                 ),
                 arrival_time:
                     Timestamp.now(), // Set arrival_time to current time
                 departure_station_id: Stations(
                   id: json['route']['departure_station_id'] as String? ?? '',
-                  // Default name is empty string
+// Default name is empty string
                   name: '',
                 ),
                 departure_time:
                     Timestamp.now(), // Set departure_time to current time
               )
-            : Routes(
-                id: '',
-                arrival_station_id: Stations(id: '', name: ''),
-                arrival_time:
-                    Timestamp.now(), // Set arrival_time to current time
-                departure_station_id: Stations(id: '', name: ''),
-                departure_time:
-                    Timestamp.now(), // Set departure_time to current time
-              );
+            : json['route_id'] != null
+                ? Routes(
+                    id: json['route_id']['id'] as String? ?? '',
+                    arrival_station_id: Stations(
+                      id: json['route_id']['arrival_station_id']['id']
+                              as String? ??
+                          '',
+// Default name is empty string
+                      name: '',
+                    ),
+                    arrival_time:
+                        Timestamp.now(), // Set arrival_time to current time
+                    departure_station_id: Stations(
+                      id: json['route_id']['departure_station_id']['id']
+                              as String? ??
+                          '',
+// Default name is empty string
+                      name: '',
+                    ),
+                    departure_time:
+                        Timestamp.now(), // Set departure_time to current time
+                  )
+                : Routes(
+                    id: '',
+                    arrival_station_id: Stations(id: '', name: ''),
+                    arrival_time:
+                        Timestamp.now(), // Set arrival_time to current time
+                    departure_station_id: Stations(id: '', name: ''),
+                    departure_time:
+                        Timestamp.now(), // Set departure_time to current time
+                  );
 
   // Static method to create Departures instance from JSON
   static Future<Departures> fromJsonWithStationNames(
       Map<String, dynamic> json) async {
     // Fetch station names asynchronously
     String arrivalStationName =
-        await fetchStationName(json['route']['arrival_station_id']);
+        await fetchStationName(json['route_id']['arrival_station_id']);
     String departureStationName =
-        await fetchStationName(json['route']['departure_station_id']);
+        await fetchStationName(json['route_id']['departure_station_id']);
 
     // Create Departures instance with station names
     return Departures.fromJson({
@@ -111,9 +131,6 @@ class Departures {
     return stationSnapshot.exists ? stationSnapshot.get('name') : '';
   }
 
-
-  
-
   Departures copyWith({
     String? id,
     Buses? bus_id,
@@ -133,6 +150,3 @@ class Departures {
     };
   }
 }
-
-
-

@@ -21,7 +21,7 @@ class _ScannnerState extends State<Scannner> {
         children: [
           QRView(
               key: _qrkey,
-              overlay: QrScannerOverlayShape(borderColor: Colors.blueAccent),
+              overlay: QrScannerOverlayShape(borderColor: Colors.red),
               onQRViewCreated: (QRViewController controller) {
                 this._controller = controller;
                 controller.scannedDataStream.listen((scanData) {
@@ -29,13 +29,23 @@ class _ScannnerState extends State<Scannner> {
                   if (mounted) {
                     _controller?.dispose();
                     Navigator.pop(context, scanData);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'ສະແກນສໍາເລັດ',
+                          style: GoogleFonts.notoSansLao(
+                              fontSize: 19, color: Colors.black),
+                        ),
+                        duration: const Duration(seconds: 5),
+                      ),
+                    );
                   }
                 });
               }),
           Align(
             alignment: Alignment.topCenter,
             child: Container(
-              margin: EdgeInsets.only(top: 60),
+              margin: const EdgeInsets.only(top: 60),
               child: Text(
                 'ສະແກນປີ້',
                 style:
@@ -69,7 +79,7 @@ class _ScannnerState extends State<Scannner> {
                     }),
                 IconButton(
                     color: Colors.white,
-                    icon: Icon(Icons.close),
+                    icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context))
               ],
             ),

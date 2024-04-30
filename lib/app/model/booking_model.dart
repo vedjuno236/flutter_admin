@@ -81,9 +81,9 @@ class Booking {
   static Future<Departures> fromJsonWithStationNames(
       Map<String, dynamic> json) async {
     String arrivalStationName =
-        await fetchStationName(json['route']['arrival_station_id'] as String);
+        await fetchStationName(json['route_id']['arrival_station_id'] as String);
     String departureStationName =
-        await fetchStationName(json['route']['departure_station_id'] as String);
+        await fetchStationName(json['route_id']['departure_station_id'] as String);
 
     return Departures.fromJson({
       ...json,

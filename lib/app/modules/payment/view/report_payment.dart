@@ -35,7 +35,7 @@ class _ReportPaymentState extends State<report_payment> {
   Widget build(BuildContext context) {
     return PdfPreview(
       canChangeOrientation: false,
-      build: (format) => generateDocument(format),
+      build: (format) => generateDocument(format), 
     );
   }
 
@@ -59,7 +59,7 @@ class _ReportPaymentState extends State<report_payment> {
       List<List<dynamic>> paymentData = payment.map((payment) {
         final payment_date =
             DateFormat('dd/MM/yyy HH:mm:ss').format(payment.pay_date.toDate());
-        final total = numberFormat.format(payment.total);
+        final total = payment.total;
         final busNames = payment.booking_id
             .map((bus) => bus.departure_id.bus_id.name)
             .toList();
@@ -97,16 +97,23 @@ class _ReportPaymentState extends State<report_payment> {
         Pass.addAll(passname);
         Pass.addAll(passid);
 
+
+
         return [
           combinedBusData,
           comnbiedData,
           routeData,
           payment_date,
           Pass,
-          total
+          total,
         ];
       }).toList();
+double totalSum = paymentData
+    .map((payment) => double.parse(payment[5].toString())) // Assuming total is at index 5
+    .reduce((value, element) => value + element);
+final TotalSum = numberFormat.format(totalSum);
 
+print('Total Sum: $totalSum');
       doc.addPage(
         pw.Page(
           pageTheme: pw.PageTheme(
@@ -183,10 +190,26 @@ class _ReportPaymentState extends State<report_payment> {
                             'ຜູ້ຊໍາລະ',
                             'ລວມເງີນ',
                           ],
+                     
                           data: paymentData),
                     ),
+                       pw.SizedBox(height: 10),
+                 
+                    pw.Align(
+  alignment: pw.Alignment.centerRight,
+  child: pw.Text(
+    ' ເງີນລວມ = $TotalSum',
+    style: pw.TextStyle(
+      font: font1,
+      fontSize: 15,
+    ),
+  ),
+),
+
                 ],
               ),
+              
+              
             );
           },
         ),

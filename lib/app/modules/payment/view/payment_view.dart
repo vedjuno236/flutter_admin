@@ -7,7 +7,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:intl/intl.dart';
 
 import '../../../service/payment_service.dart';
-
+import '../../../service/routes_service.dart' as routes;
 class PaymentView extends StatefulWidget {
   const PaymentView({Key? key}) : super(key: key);
 
@@ -17,6 +17,9 @@ class PaymentView extends StatefulWidget {
 
 class _PaymentViewState extends State<PaymentView> {
   final DatabaseService _databaseService = DatabaseService();
+   final routes.DatabaseService _databaseRoutesService =
+      routes.DatabaseService();
+
   var _searchQuery = "";
   NumberFormat numberFormat =
       NumberFormat.currency(locale: 'lo_LA', symbol: '₭');
@@ -142,7 +145,7 @@ class _PaymentViewState extends State<PaymentView> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'ລະຫັດການຈອງ: ',
+                                            'ລະຫັດຂອງລົດ: ',
                                             style: GoogleFonts.notoSansLao(
                                                 fontSize: 17),
                                           ),
@@ -192,7 +195,7 @@ class _PaymentViewState extends State<PaymentView> {
                                           ),
                                           Divider(),
                                           Text(
-                                            'ລະຫັດເດີນທາງ: ',
+                                            'ລະຫັດເດີນທາງ:',
                                             style: GoogleFonts.notoSansLao(
                                                 fontSize: 17),
                                           ),
@@ -206,21 +209,21 @@ class _PaymentViewState extends State<PaymentView> {
                                                   .route_id
                                                   .departure_station_id
                                                   .id;
-
                                               final arrivalId = booking
                                                   .departure_id
                                                   .route_id
                                                   .arrival_station_id
                                                   .id;
-                                              print(
-                                                  'ຕົ້ນທາງ: $departureId, ປາຍທາງ: $arrivalId');
+                                              print('Departure: $departureId, Arrival: $arrivalId');
                                               return Text(
-                                                ' ຕົ້ນທາງ:  $departureId ->ປາຍທາງ: $arrivalId',
+                                                ' $departureId -> $arrivalId',
                                                 style: GoogleFonts.notoSans(
                                                     fontSize: 16),
                                               );
                                             }).toList(),
                                           ),
+                                          Divider(),
+
                                           Text(
                                             'ຄໍາອະທຶບາຍ: ${paymentData.description}',
                                             style: GoogleFonts.notoSansLao(
@@ -250,7 +253,7 @@ class _PaymentViewState extends State<PaymentView> {
                                             style: GoogleFonts.notoSansLao(
                                                 fontSize: 17),
                                           ),
-                                              Row(
+                                          Row(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: paymentData.booking_id
@@ -258,8 +261,8 @@ class _PaymentViewState extends State<PaymentView> {
                                               final passname =
                                                   booking.passenger_id.name;
 
-                                              final passid =
-                                                  booking.passenger_id.phoneNumber;
+                                              final passid = booking
+                                                  .passenger_id.phoneNumber;
 
                                               return Text(
                                                 '  $passname : $passid',
@@ -314,6 +317,7 @@ class _PaymentViewState extends State<PaymentView> {
                           })))
             ])));
   }
+
   Future EditeDialog() => showDialog(
         context: context,
         builder: (context) => AlertDialog(

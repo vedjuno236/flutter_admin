@@ -3,10 +3,13 @@ import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_admin/app/modules/home/view/home_view.dart';
+import 'package:flutter_admin/app/modules/login/view/otp_register.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:page_transition/page_transition.dart';
+
+import '../../../service/firebase_firestore_service.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -21,8 +24,8 @@ class _LoginViewState extends State<LoginView> {
   // late RegisterController registerController;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  // final FirebaseFirestoreService firebaseFirestoreService =
-  //     FirebaseFirestoreService();
+  final FirebaseFirestoreService firebaseFirestoreService =
+      FirebaseFirestoreService();
   File? imageFile, profileImage;
 
   Country selectedCountry = Country(
@@ -122,77 +125,43 @@ class _LoginViewState extends State<LoginView> {
               child: Column(children: [
                 Column(
                   children: [
-                    // Stack(
-                    //     // crossAxisAlignment: CrossAxisAlignment.start,
-                    //     children: [
-                    //       // registerController.profileImage == null
-                    //           // ?
-                    //            Center(
-                    //               child: GestureDetector(
-                    //                 onTap: () {
-                    //                   showfileImagePickerOption(context);
-                    //                 },
-                    //                 child: CircleAvatar(
-                    //                   radius: 60,
-                    //                   backgroundColor: Colors.grey[200],
-                    //                   child: const Icon(
-                    //                     Icons.people_sharp,
-                    //                     size: 60,
-                    //                     color: Colors.black12,
-                    //                   ),
-                    //                 ),
-                    //               ),
-                    //             )
-                    //           // : Center(
-                    //           //     child: GestureDetector(
-                    //           //       onTap: () {
-                    //           //         showfileImagePickerOption(context);
-                    //           //       },
-                    //                 // child: CircleAvatar(
-                    //                 //   radius: 60,
-                    //                 //   backgroundImage: FileImage(
-                    //                 //       // registerController.profileImage!
-                    //                 //       ),
-                    //                 // ),
-                    //               // ),
-                    //             // ),
-                    //       Positioned(
-                    //           bottom: -0,
-                    //           left: 195,
-                    //           child: IconButton(
-                    //               onPressed: () {
-                    //                 showImagePickerOption(context);
-                    //               },
-                    //               icon: const Icon(
-                    //                 Icons.add_a_photo,
-                    //                 color: Colors.black26,
-                    //                 size: 30,
-                    //               )))
-                    //     ]),
                     Stack(
                       children: [
-                        Center(
-                          child: GestureDetector(
-                            onTap: () {
-                              showfileImagePickerOption(context);
-                            },
-                            child: CircleAvatar(
-                              radius: 60,
-                              backgroundColor: Colors.grey[200],
-                              child: const Icon(
-                                Icons.people_sharp,
-                                size: 60,
-                                color: Colors.black12,
+                        profileImage == null
+                            ? Center(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showfileImagePickerOption(context);
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 60,
+                                    backgroundColor: Colors.grey[200],
+                                    child: const Icon(
+                                      Icons.people_sharp,
+                                      size: 60,
+                                      color: Colors.black12,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Center(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showfileImagePickerOption(context);
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 60,
+                                    backgroundImage: FileImage(profileImage!),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
                         Positioned(
                           bottom: -0,
                           left: 195,
                           child: IconButton(
                             onPressed: () {
-                              showImagePickerOption(context);
+                               showfileImagePickerOption(context);
+
                             },
                             icon: const Icon(
                               Icons.add_a_photo,
@@ -203,7 +172,6 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ],
                     ),
-
                     const Row(
                       children: [
                         Text(
@@ -301,46 +269,21 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     TextField(
                       readOnly: true,
-                      onTap: () {
-                        showCupertinoModalPopup(
+                      onTap: () async {
+                        final selectedDate = await showDatePicker(
                           context: context,
-                          builder: (context) {
-                            return Container(
-                              height: MediaQuery.of(context).size.height * 0.4,
-                              color: Colors.white,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text('ຢືນຢັນ'),
-                                  ),
-                                  Expanded(
-                                    child: CupertinoDatePicker(
-                                      initialDateTime: datetime,
-                                      mode: CupertinoDatePickerMode.date,
-                                      minimumDate: DateTime(2000),
-                                      maximumDate: DateTime.now().add(
-                                        const Duration(days: 2 * 365),
-                                      ),
-                                      onDateTimeChanged: (date) {
-                                        // setState(() {
-                                        //   datetime = date;
-                                        //   registerController
-                                        //       .setDobDateTime(date);
-                                        // });
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
+                          initialDate: datetime,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(3000),
                         );
+
+                        if (selectedDate != null) {
+                          setState(() {
+                            datetime = selectedDate;
+// setDobDateTime(selectedDate);
+                          });
+                        }
                       },
-                      // controller: registerController.dobController,
                       decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                           borderSide: const BorderSide(
@@ -352,11 +295,11 @@ class _LoginViewState extends State<LoginView> {
                               color: Color.fromARGB(255, 207, 207, 207)),
                           borderRadius: BorderRadius.circular(8.5),
                         ),
-                        prefixIcon:
-                            Icon(Icons.data_array, color: Colors.black12),
-                        hintText: datetime
-                            .toIso8601String()
-                            .split('T')[0], // Extract the date part
+                        prefixIcon: const Icon(Icons.data_array,
+                            color: Color.fromARGB(31, 199, 160, 160)),
+                        hintText: datetime != null
+                            ? "${datetime.day.toString().padLeft(2, '0')}/${datetime.month.toString().padLeft(2, '0')}/${datetime.year}"
+                            : '', // Format the date
                         hintStyle: GoogleFonts.notoSansLao(
                           color: Colors.grey.shade600,
                         ),
@@ -573,10 +516,10 @@ class _LoginViewState extends State<LoginView> {
                                 });
                               },
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 10.0,
                             ),
-                            Text(
+                            const Text(
                               "ຍີງ",
                               style: TextStyle(fontSize: 15),
                             )
@@ -601,70 +544,66 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     SizedBox(height: 5),
                     GestureDetector(
-                        onTap: () async {
-                          // getImage(source: ImageSource.camera);
-                          showImagePickerOption(context);
-                        },
-                        // child: registerController.imageFile == null
-                        // ?
-                        child: Container(
-                          // width: 310,
-                          width: MediaQuery.of(context).size.width,
-                          height: 440,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border:
-                                Border.all(width: 1, color: Colors.redAccent),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // Image.asset('assets/images/id-card.png'),
-                              GestureDetector(
+                      onTap: () async {
+                        showImagePickerOption(context);
+                      },
+                      child: imageFile == null
+                          ? Container(
+                              // width: 310,
+                              width: MediaQuery.of(context).size.width,
+                              height: 550,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                    width: 1, color: Colors.redAccent),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset('assets/images/card.png'),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      getImage(source: ImageSource.camera);
+                                    },
+                                    child: const Text(
+                                      'ກົດເພື່ອອັບໂຫລດຮູບພາບເອກະສານ',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: 440,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                image: DecorationImage(
+                                  image: FileImage(imageFile!),
+                                  fit: BoxFit.cover,
+                                ),
+                                border: Border.all(
+                                    width: 1, color: Colors.redAccent),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              child: GestureDetector(
                                 onTap: () async {
-                                  getImage(source: ImageSource.camera);
+                                  showImagePickerOption(context);
                                 },
                                 child: const Text(
-                                  'ກົດເພື່ອອັບໂຫລດຮູບພາບເອກະສານ',
+                                  '',
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),
                                 ),
                               ),
-                            ],
-                          ),
-                        )
-                        // : Container(
-                        //     width: MediaQuery.of(context).size.width,
-                        //     height: 440,
-                        //     alignment: Alignment.center,
-                        //     decoration: BoxDecoration(
-                        //       color: Colors.white,
-                        //       // image: DecorationImage(
-                        //       //    image:
-                        //       //        FileImage(registerController.imageFile!),
-                        //       //   fit: BoxFit.cover,
-                        //       // ),
-                        //       border: Border.all(
-                        //           width: 1, color: Colors.redAccent),
-                        //       borderRadius: BorderRadius.circular(12.0),
-                        //     ),
-                        //     child: GestureDetector(
-                        //       onTap: () async {
-                        //         // getImage(source: ImageSource.camera);
-                        //         showImagePickerOption(context);
-                        //       },
-                        //       child: const Text(
-                        //         '',
-                        //         style: TextStyle(
-                        //             fontSize: 18,
-                        //             fontWeight: FontWeight.bold),
-                        //       ),
-                        //     ),
-                        //   ),
-                        ),
+                            ),
+                    ),
                     const SizedBox(
                       height: 10,
                     ),
@@ -684,7 +623,7 @@ class _LoginViewState extends State<LoginView> {
                           context,
                           PageTransition(
                             type: PageTransitionType.rightToLeft,
-                            child: HomeView(),
+                            child: OtpRegisterView(),
                           ),
                         );
                       },
@@ -727,7 +666,7 @@ class _LoginViewState extends State<LoginView> {
 
     if (file?.path != null) {
       setState(() {
-        // registerController.imageFile = File(file!.path);
+        imageFile = File(file!.path);
       });
     }
   }
@@ -742,7 +681,7 @@ class _LoginViewState extends State<LoginView> {
 
     if (file?.path != null) {
       setState(() {
-        // registerController.profileImage = File(file!.path);
+        profileImage = File(file!.path);
       });
     }
   }
@@ -755,7 +694,7 @@ class _LoginViewState extends State<LoginView> {
     setState(() {
       if (returnImage?.path != null) {
         setState(() {
-          // registerController.profileImage = File(returnImage!.path);
+          profileImage = File(returnImage!.path);
         });
       }
     });
@@ -769,7 +708,7 @@ class _LoginViewState extends State<LoginView> {
 
     if (returnImage?.path != null) {
       setState(() {
-        // registerController.profileImage = File(returnImage!.path);
+        profileImage = File(returnImage!.path);
       });
     }
     Navigator.of(context).pop();
@@ -783,7 +722,7 @@ class _LoginViewState extends State<LoginView> {
     setState(() {
       if (returnImage?.path != null) {
         setState(() {
-          // registerController.imageFile = File(returnImage!.path);
+          imageFile = File(returnImage!.path);
         });
       }
     });
@@ -797,7 +736,7 @@ class _LoginViewState extends State<LoginView> {
 
     if (returnImage?.path != null) {
       setState(() {
-        // registerController.imageFile = File(returnImage!.path);
+        imageFile = File(returnImage!.path);
       });
     }
     Navigator.of(context).pop();

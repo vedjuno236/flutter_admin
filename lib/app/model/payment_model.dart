@@ -27,11 +27,12 @@ class Payment {
         total = int.parse(json?['total'] as String? ?? '0'),
         user_id = json?['user_id'] as String? ?? '',
         id = json?['id'] as String? ?? '',
-        booking_id =
-            (json?['booking_id'] as List<Map<String,dynamic>>?)?.map((bookingJson) {
-                  return Booking.fromJson(bookingJson as Map<String, dynamic>);
-                }).toList() ??
-                [];
+        booking_id = (json?['booking_id'] as List<Map<String, dynamic>>?)
+                ?.map((bookingJson) {
+              return Booking.fromJson(bookingJson as Map<String, dynamic>);
+            }).toList() ??
+            [];
+
   Map<String, dynamic> toJson() {
     return {
       'booking_id': booking_id.map((booking) => booking.toJson()).toList(),

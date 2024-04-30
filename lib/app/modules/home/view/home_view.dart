@@ -6,7 +6,6 @@ import 'package:flutter_admin/app/modules/booking/view/booking_view.dart';
 import 'package:flutter_admin/app/modules/bus/view/bus_view.dart';
 import 'package:flutter_admin/app/modules/bustype/view/bustype_view.dart';
 import 'package:flutter_admin/app/modules/departures/view/departures_view.dart';
-import 'package:flutter_admin/app/modules/home/view/scaner.dart';
 import 'package:flutter_admin/app/modules/home/view/scannner.dart';
 import 'package:flutter_admin/app/modules/payment/view/payment_view.dart';
 import 'package:flutter_admin/app/modules/routes/view/routes_view.dart';
@@ -134,18 +133,7 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  void scnQR() async {
-    String barcodeScanRes;
-    try {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-          "#ff6666", "cancel", true, ScanMode.QR);
-    } on PlatformException {
-      barcodeScanRes = "Failed to get platform version";
-    }
-    setState(() {
-      _scanBarcodeResult = barcodeScanRes;
-    });
-  }
+ 
 
   Future _openSanner(BuildContext context) async {
     final result = await Navigator.push(

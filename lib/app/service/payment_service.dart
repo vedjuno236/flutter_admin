@@ -16,9 +16,12 @@ class DatabaseService {
   final FirebaseFirestore _firebase = FirebaseFirestore.instance;
 
   late final CollectionReference _PaymentRef;
-
+  late final CollectionReference _departuresRef;
+  late final CollectionReference _routesRef;
   DatabaseService() {
     _PaymentRef = _firebase.collection(TODO_COLLECTION_REF);
+    _routesRef = _firebase.collection(ROUTES_COLLECTION_REF);
+    _departuresRef = _firebase.collection(DEPARTURES_COLLECTION_REF);
   }
 
   Stream<List<Payment>> getPayment({String? nameQuery}) {
@@ -32,35 +35,45 @@ class DatabaseService {
                 !paymentData.containsKey('booking_id')) {
               return null;
             }
-            final bookingIds = List<String>.from(paymentData['booking_id']);
+          final bookingIds = paymentData['booking_id'] as List<dynamic>? ?? [];
+
+            print(
+                'Type of booking_id: ${paymentData['booking_id'].runtimeType}');
+            print('Contents of booking_id: ${paymentData['booking_id']}');
+
             List<Map<String, dynamic>> bookingList = [];
+
             for (String bookingId in bookingIds) {
               final booking.DatabaseService _databasebookingService =
                   booking.DatabaseService();
               final bookings = await _databasebookingService
                   .getBooking(nameQuery: bookingId)
                   .first;
+
               if (bookings.isNotEmpty) {
-                for (final booking in bookings) {
-                  final deprecateId =
-                      booking.departure_id.route_id.departure_station_id.id;
-                  final arrivalid =
-                      booking.departure_id.route_id.arrival_station_id.id;
-                  print('routes:$deprecateId -> $arrivalid');
-                }
                 bookingList.addAll(
                     bookings.map((booking) => booking.toJson()).toList());
               } else {
-                // print('No booking data found for booking ID: $bookingId');
+                print('No booking data found for booking ID: $bookingId');
               }
             }
             paymentData['booking_id'] = bookingList;
-           
             // debugPrint('bookingList: ${bookingList[0]}', wrapWidth: 1024);
-            Payment payment = Payment.fromJson(paymentData);
-
             debugPrint(
-                'First booking_id: ${payment.booking_id[0].departure_id.route_id.toJson()}');
+                'Arrival Station ID: ${bookingList[0]['departure_id']['route_id']['arrival_station_id']['id']}');
+            debugPrint(
+                'Departure Station ID: ${bookingList[0]['departure_id']['route_id']['departure_station_id']['id']}');
+
+            Payment payment = Payment.fromJson(paymentData);
+            if (payment.booking_id.isNotEmpty) {
+              debugPrint(
+                  'First booking_routes: ${payment.booking_id[0].departure_id.route_id.departure_station_id.id}');
+
+              debugPrint(
+                  'First booking_bus: ${payment.booking_id[0].departure_id.bus_id.carnamber}');
+            } else {
+              print('No booking data found for payment: ${payment.id}');
+            }
             return payment;
           } catch (e) {
             print('Error processing payment: $e');
@@ -75,7 +88,7 @@ class DatabaseService {
             .toList();
         if (nameQuery != null && nameQuery.isNotEmpty) {
           return filteredPayment
-              .where((payment) => payment.id == nameQuery)
+              .where((payment) => payment.payment_method == nameQuery)
               .toList();
         } else {
           return filteredPayment;
