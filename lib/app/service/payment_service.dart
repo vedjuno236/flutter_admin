@@ -35,7 +35,8 @@ class DatabaseService {
                 !paymentData.containsKey('booking_id')) {
               return null;
             }
-          final bookingIds = paymentData['booking_id'] as List<dynamic>? ?? [];
+            final bookingIds =
+                paymentData['booking_id'] as List<dynamic>? ?? [];
 
             print(
                 'Type of booking_id: ${paymentData['booking_id'].runtimeType}');
@@ -71,6 +72,8 @@ class DatabaseService {
 
               debugPrint(
                   'First booking_bus: ${payment.booking_id[0].departure_id.bus_id.carnamber}');
+
+              debugPrint('image_payment: ${payment.image_payment}');
             } else {
               print('No booking data found for payment: ${payment.id}');
             }

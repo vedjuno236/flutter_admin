@@ -17,3 +17,4 @@ samples, guidance on mobile development, and a full API reference.
 # flutter-admin
 # project_admin
 # flutter_admin
+# flutter_admin

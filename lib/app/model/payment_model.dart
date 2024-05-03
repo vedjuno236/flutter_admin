@@ -7,6 +7,8 @@ class Payment {
   String description;
   Timestamp pay_date;
   String payment_method;
+  String image_payment;
+
   int total;
   String user_id;
 
@@ -16,6 +18,8 @@ class Payment {
     required this.description,
     required this.pay_date,
     required this.payment_method,
+    required this.image_payment,
+
     required this.total,
     required this.user_id,
   });
@@ -27,6 +31,7 @@ class Payment {
         total = int.parse(json?['total'] as String? ?? '0'),
         user_id = json?['user_id'] as String? ?? '',
         id = json?['id'] as String? ?? '',
+        image_payment=json?['image_payment'] as String? ?? '',
         booking_id = (json?['booking_id'] as List<Map<String, dynamic>>?)
                 ?.map((bookingJson) {
               return Booking.fromJson(bookingJson as Map<String, dynamic>);
@@ -37,6 +42,7 @@ class Payment {
     return {
       'booking_id': booking_id.map((booking) => booking.toJson()).toList(),
       'description': description,
+      'image_payment':image_payment,
       'pay_date': pay_date,
       'payment_method': payment_method,
       'total': total.toString(),

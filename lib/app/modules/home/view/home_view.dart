@@ -11,10 +11,12 @@ import 'package:flutter_admin/app/modules/payment/view/payment_view.dart';
 import 'package:flutter_admin/app/modules/routes/view/routes_view.dart';
 import 'package:flutter_admin/app/modules/stations/view/station_view.dart';
 import 'package:flutter_admin/app/modules/tickets/view/tickets_view.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:badges/badges.dart' as badgelib;
+import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badge;
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -33,7 +35,7 @@ class _HomeViewState extends State<HomeView> {
   int CountTickets = 0;
   int CounBooking = 0;
   int CountPayment = 0;
-  String _scanBarcodeResult = '';
+
   void countFirebasePass() {
     FirebaseFirestore.instance
         .collection('Passengers')
@@ -133,8 +135,6 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
- 
-
   Future _openSanner(BuildContext context) async {
     final result = await Navigator.push(
         context, MaterialPageRoute(builder: (c) => Scannner()));
@@ -169,15 +169,18 @@ class _HomeViewState extends State<HomeView> {
             fontSize: 18,
           ),
         ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
+        actions: const [
+          badge.Badge(
+            badgeContent: Text('3'),
+            child: Icon(Icons.notifications),
           ),
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {},
-          ),
+          Text(
+            '.......',
+            style: TextStyle(
+              color: Colors.white,
+              // Add other text style properties as needed
+            ),
+          )
         ],
       ),
       drawer: NavigationDrawer(),

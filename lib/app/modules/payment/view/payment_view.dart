@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 
 import '../../../service/payment_service.dart';
 import '../../../service/routes_service.dart' as routes;
+import 'package:insta_image_viewer/insta_image_viewer.dart';
+
 class PaymentView extends StatefulWidget {
   const PaymentView({Key? key}) : super(key: key);
 
@@ -17,7 +19,7 @@ class PaymentView extends StatefulWidget {
 
 class _PaymentViewState extends State<PaymentView> {
   final DatabaseService _databaseService = DatabaseService();
-   final routes.DatabaseService _databaseRoutesService =
+  final routes.DatabaseService _databaseRoutesService =
       routes.DatabaseService();
 
   var _searchQuery = "";
@@ -91,8 +93,8 @@ class _PaymentViewState extends State<PaymentView> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.orangeAccent, // Background color
-                        onPrimary: Colors.white, // Text color
+                        primary: Colors.orangeAccent,
+                        onPrimary: Colors.white,
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -102,8 +104,7 @@ class _PaymentViewState extends State<PaymentView> {
                             style: GoogleFonts.notoSansLao(),
                           ),
                           const SizedBox(
-                            width:
-                                10, // Adjust the width according to your needs
+                            width: 10,
                           ),
                           const Icon(
                             Icons.read_more_sharp,
@@ -136,7 +137,7 @@ class _PaymentViewState extends State<PaymentView> {
                                 itemCount: snapshot.data!.length,
                                 itemBuilder: (context, index) {
                                   final paymentData = snapshot.data![index];
-
+                                
                                   String paymentId = paymentData.id;
                                   return Card(
                                     child: ListTile(
@@ -214,7 +215,8 @@ class _PaymentViewState extends State<PaymentView> {
                                                   .route_id
                                                   .arrival_station_id
                                                   .id;
-                                              print('Departure: $departureId, Arrival: $arrivalId');
+                                              print(
+                                                  'Departure: $departureId, Arrival: $arrivalId');
                                               return Text(
                                                 ' $departureId -> $arrivalId',
                                                 style: GoogleFonts.notoSans(
@@ -223,7 +225,6 @@ class _PaymentViewState extends State<PaymentView> {
                                             }).toList(),
                                           ),
                                           Divider(),
-
                                           Text(
                                             'ຄໍາອະທຶບາຍ: ${paymentData.description}',
                                             style: GoogleFonts.notoSansLao(
@@ -270,6 +271,47 @@ class _PaymentViewState extends State<PaymentView> {
                                                     fontSize: 16),
                                               );
                                             }).toList(),
+                                          ),
+                                          Text(
+                                            'ຮູບພາບການໂອນເງີນ:',
+                                            style: GoogleFonts.notoSansLao(
+                                                fontSize: 17),
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Container(
+                                            width: 100,
+                                            height: 100,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white70,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              border: Border.all(
+                                                color: Colors.redAccent,
+                                              ),
+                                            ),
+                                            child: paymentData
+                                                    .image_payment.isNotEmpty
+                                                ? InstaImageViewer(
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                      child: Image.network(
+                                                        paymentData
+                                                            .image_payment,
+                                                        width: 200,
+                                                        height: 200,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context,
+                                                            error, stackTrace) {
+                                                          return Text(
+                                                              'Error loading image');
+                                                        },
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Text('No image available'),
                                           ),
                                         ],
                                       ),
